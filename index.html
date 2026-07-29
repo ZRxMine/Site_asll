@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Session 10 دقیقه - Login</title>
+  <style>
+    body{font-family:tahoma;background:#0b1220;color:#e8eefc;margin:0;padding:16px}
+    .wrap{max-width:760px;margin:auto;display:grid;gap:12px}
+    .card{background:#111a2e;border:1px solid #203055;border-radius:12px;padding:16px}
+    input,button{width:100%;box-sizing:border-box;margin-top:8px;padding:10px;border-radius:10px;border:1px solid #2a3b63;background:#0b1220;color:#e8eefc}
+    button{cursor:pointer;border:none;background:#1f6feb;font-weight:900}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    @media(max-width:720px){.row{grid-template-columns:1fr}}
+    .muted{opacity:.75;font-size:13px;margin-top:8px}
+    .hidden{display:none}
+    .danger{background:#c0392b}
+    .ok{background:#1f6feb}
+    .small{font-size:13px;opacity:.9}
+    .topTitle{margin:0 0 8px 0}
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="card">
+    <h2 class="topTitle">پنل سایت</h2>
+    <div id="timerLine" class="muted"></div>
+
+    <!-- بخش لاگین -->
+    <div id="loginBox">
+      <div class="row">
+        <div>
+          <label class="small">نام کاربری</label>
+          <input id="username" placeholder="مثلاً Steve123" autocomplete="username" />
+        </div>
+        <div>
+          <label class="small">پسورد</label>
+          <input id="password" type="password" placeholder="پسورد اکانت" autocomplete="current-password" />
+        </div>
+      </div>
+
+      <button id="btnLogin" class="ok" style="margin-top:12px;">ورود</button>
+
+      <button id="btnCreate" class="ok" style="margin-top:10px;">ساخت اکانت</button>
+      <button id="btnClear" class="danger" style="margin-top:10px;">پاک کردن همه (فقط تست)</button>
+
+      <div id="status" class="muted"></div>
+    </div>
+
+    <!-- بخش وارد شده -->
+    <div id="appBox" class="hidden">
+      <div class="small">✅ وارد شده‌اید به عنوان:</div>
+      <div style="font-weight:900;margin-top:6px;font-size:18px" id="who"></div>
+
+      <div class="muted" style="margin-top:10px">
+        تا <b id="exp"></b> زمان باقی مانده.
+      </div>
+
+      <div style="margin-top:14px;padding:12px;border:1px dashed #2a3b63;border-radius:12px">
+        محتوای اصلی سایت همینجاست… (هرچی می‌خوای اینجا بذار)
+      </div>
+
+      <button id="btnLogout" class="danger" style="margin-top:14px; width:auto; padding:10px 14px;">خروج</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const LS_USERS = "site:users:v1";
+  const LS_SESSION = "site:session:v1";
+  const SESSION_TTL_MS = 10 * 60 * 1000; // 10 دقیقه
+
+  const $ = (id) => document.getElementById(id);
+
+  function setStatus(t){ $("status").textContent = t || ""; }
+
+  function now(){ return Date.now(); }
+
+  function loadUsers(){
+    const raw = localStorage.getItem(LS_USERS);
+    if(!raw) return {};
+    try{
+      const obj = JSON.parse(raw);
+      return (obj && typeof obj === "object") ? obj : {};
+    }catch{ return {}; }
+  }
+
+  function saveUsers(users){
+    localStorage.setItem(LS_USERS, JSON.stringify(users));
+  }
+
+  function loadSession(){
+    const raw = localStorage.getItem(LS_SESSION);
+    if(!raw) return null;
+    try{ return JSON.parse(raw); }catch{ return null; }
+  }
+
+  function saveSession(sess){
+    localStorage.setItem(LS_SESSION, JSON.stringify(sess));
+  }
+
+  function clearSession(){
+    localStorage.removeItem(LS_SESSION);
+  }
+
+  function clearAll(){
+    localStorage.removeItem(LS_USERS);
+    localStorage.removeItem(LS_SESSION);
+  }
+
+  async function sha256(text){
+    const enc = new TextEncoder().encode(text);
+    const buf = await crypto.subtle.digest("SHA-256", enc);
+    return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2,"0")).join("");
+  }
+
+  function render(){
+    const sess = loadSession();
+
+    const loginBox = $("loginBox");
+    const appBox = $("appBox");
+    const expLine = $("timerLine");
+
+    if(!sess || !sess.username || !sess.expAt){
+      loginBox.classList.remove("hidden");
+      appBox.classList.add("hidden");
+      expLine.textContent = "";
+      setStatus("");
+      return;
+    }
+
+    const expAt = Number(sess.expAt);
+
+    if(!Number.isFinite(expAt) || now() > expAt){
+      clearSession();
+      loginBox.classList.remove("hidden");
+      appBox.classList.add("hidden");
+      expLine.textContent = "";
+      $("who").textContent = "";
+      $("exp").textContent = "";
+      setStatus("سشن منقضی شد. دوباره وارد شوید.");
+      return;
+    }
+
+    loginBox.classList.add("hidden");
+    appBox.classList.remove("hidden");
+    $("who").textContent = sess.username;
+    $("exp").textContent = new Date(expAt).toLocaleString("fa-IR");
+
+    // نمایش تایمر
+    const remainMs = expAt - now();
+    const s = Math.max(0, Math.floor(remainMs/1000));
+    const m = Math.floor(s/60);
+    const sec = (s%60).toString().padStart(2,"0");
+    expLine.textContent = `زمان باقی‌مانده: ${m} دقیقه و ${sec} ثانیه`;
+    setStatus("");
+  }
+
+  // در هر بار refresh، همین که صفحه بالا آمد render می‌کنه
+  render();
+  setInterval(render, 1000);
+
+  $("btnLogin").addEventListener("click", async ()=>{
+    const username = $("username").value.trim();
+    const password = $("password").value;
+
+    if(!username){ setStatus("نام کاربری را وارد کن."); return; }
+    if(!password){ setStatus("پسورد را وارد کن."); return; }
+
+    const users = loadUsers();
+    const u = users[username];
+    if(!u){ setStatus("اکانت پیدا نشد. یا اول بساز."); return; }
+
+    const hash = await sha256(password);
+    if(hash !== u.passHash){ setStatus("پسورد اشتباه است."); return; }
+
+    saveSession({ username, expAt: now() + SESSION_TTL_MS });
+    render();
+  });
+
+  $("btnCreate").addEventListener("click", async ()=>{
+    const username = $("username").value.trim();
+    const password = $("password").value;
+
+    if(username.length < 3){ setStatus("نام کاربری حداقل ۳ کاراکتر باشد."); return; }
+    if(password.length < 4){ setStatus("پسورد حداقل ۴ کاراکتر باشد."); return; }
+
+    const users = loadUsers();
+    if(users[username]){ setStatus("این نام کاربری قبلاً ساخته شده است."); return; }
+
+    const hash = await sha256(password);
+    users[username] = { passHash: hash, createdAt: new Date().toISOString() };
+    saveUsers(users);
+
+    setStatus("اکانت ساخته شد ✅ حالا وارد شو.");
+  });
+
+  $("btnLogout").addEventListener("click", ()=>{
+    clearSession();
+    render();
+  });
+
+  $("btnClear").addEventListener("click", ()=>{
+    if(confirm("همه اکانت‌ها و سشن‌ها پاک می‌شود؟ (فقط تست)")){
+      clearAll();
+      render();
+    }
+  });
+</script>
+</body>
+</html>
