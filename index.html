@@ -3,80 +3,374 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Session 10 دقیقه - Login</title>
+  <title>ZRX_LAND | Login</title>
   <style>
-    body{font-family:tahoma;background:#0b1220;color:#e8eefc;margin:0;padding:16px}
-    .wrap{max-width:760px;margin:auto;display:grid;gap:12px}
-    .card{background:#111a2e;border:1px solid #203055;border-radius:12px;padding:16px}
-    input,button{width:100%;box-sizing:border-box;margin-top:8px;padding:10px;border-radius:10px;border:1px solid #2a3b63;background:#0b1220;color:#e8eefc}
-    button{cursor:pointer;border:none;background:#1f6feb;font-weight:900}
-    .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-    @media(max-width:720px){.row{grid-template-columns:1fr}}
-    .muted{opacity:.75;font-size:13px;margin-top:8px}
-    .hidden{display:none}
-    .danger{background:#c0392b}
-    .ok{background:#1f6feb}
-    .small{font-size:13px;opacity:.9}
-    .topTitle{margin:0 0 8px 0}
+    :root{
+      --bg1:#07110a;
+      --bg2:#0b1f10;
+      --card: rgba(15, 20, 30, .78);
+      --card2: rgba(10, 14, 22, .62);
+      --stroke: rgba(255,255,255,.10);
+      --text:#e9f2ff;
+      --muted:rgba(233,242,255,.75);
+      --green:#19ff7a;
+      --green2:#00d86b;
+      --shadow: 0 18px 60px rgba(0,0,0,.45);
+      --radius: 22px;
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Tahoma, Arial;
+      background:
+        radial-gradient(1200px 800px at 50% 20%, rgba(25,255,122,.20), transparent 55%),
+        radial-gradient(900px 600px at 15% 80%, rgba(0,216,107,.14), transparent 60%),
+        linear-gradient(180deg, var(--bg1), var(--bg2));
+      color:var(--text);
+      overflow-x:hidden;
+    }
+
+    /* glow squares background */
+    .bg-glow{
+      position:fixed; inset:0; pointer-events:none; opacity:.9;
+      background:
+        radial-gradient(circle at 20% 30%, rgba(25,255,122,.18) 0 28%, transparent 29%),
+        radial-gradient(circle at 80% 20%, rgba(0,216,107,.18) 0 25%, transparent 26%),
+        radial-gradient(circle at 70% 75%, rgba(25,255,122,.16) 0 22%, transparent 23%),
+        radial-gradient(circle at 25% 80%, rgba(0,216,107,.14) 0 20%, transparent 21%);
+      filter: blur(0px);
+    }
+    .grid{
+      position:fixed; inset:-40px;
+      pointer-events:none;
+      background:
+        linear-gradient(to right, rgba(255,255,255,.06) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255,255,255,.06) 1px, transparent 1px);
+      background-size: 68px 68px;
+      opacity:.10;
+      transform: perspective(900px) rotateX(58deg) translateY(120px);
+      transform-origin: top;
+    }
+    .wrap{
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:28px 16px;
+      position:relative;
+    }
+
+    .shell{
+      width:min(980px, 100%);
+      display:grid;
+      grid-template-columns: 1.05fr .95fr;
+      gap:22px;
+      align-items:center;
+    }
+    @media (max-width: 860px){
+      .shell{ grid-template-columns: 1fr; }
+    }
+
+    .hero{
+      padding:22px;
+    }
+    .brand{
+      display:flex; gap:12px; align-items:center;
+      margin-bottom:14px;
+    }
+    .logo{
+      width:54px; height:54px; border-radius:16px;
+      background:
+        radial-gradient(circle at 30% 30%, rgba(255,255,255,.18), transparent 35%),
+        linear-gradient(135deg, rgba(25,255,122,.95), rgba(0,216,107,.55));
+      box-shadow: 0 18px 40px rgba(25,255,122,.18);
+      border:1px solid rgba(255,255,255,.18);
+      display:flex; align-items:center; justify-content:center;
+      font-weight:1000; letter-spacing:.5px;
+    }
+    .title{
+      font-size:44px; font-weight:1000; line-height:1;
+      margin:0;
+      letter-spacing: 1px;
+      text-shadow: 0 0 22px rgba(25,255,122,.22);
+    }
+    .subtitle{
+      margin-top:10px;
+      color:var(--muted);
+      font-size:15px;
+      line-height:1.9;
+    }
+    .tag{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:10px 14px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(10,14,22,.45);
+      margin-top:16px;
+      color: rgba(233,242,255,.88);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.04);
+    }
+    .dot{
+      width:10px; height:10px; border-radius:50%;
+      background: var(--green);
+      box-shadow: 0 0 18px rgba(25,255,122,.6);
+    }
+
+    /* card */
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+      border:1px solid rgba(255,255,255,.10);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .card-inner{
+      padding:22px;
+      background: rgba(6,10,16,.35);
+      backdrop-filter: blur(10px);
+    }
+    .card-top{
+      text-align:center;
+      padding-bottom:14px;
+      border-bottom:1px solid rgba(255,255,255,.08);
+      margin-bottom:16px;
+    }
+    .card-top .brandText{
+      font-weight:1000;
+      font-size:26px;
+      letter-spacing: .8px;
+      color:#eafff4;
+    }
+    .hint{
+      margin-top:8px;
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.7;
+    }
+
+    .field{
+      margin-top:14px;
+    }
+    label{
+      display:block;
+      color: rgba(233,242,255,.85);
+      font-size:13px;
+      margin-bottom:7px;
+      font-weight:800;
+    }
+    input{
+      width:100%;
+      padding:12px 12px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(5,8,12,.40);
+      outline:none;
+      color:var(--text);
+      box-shadow: inset 0 0 0 1px rgba(0,0,0,.18);
+    }
+    input::placeholder{ color: rgba(233,242,255,.40); }
+
+    .btn{
+      margin-top:16px;
+      width:100%;
+      padding:12px 14px;
+      border:none;
+      border-radius:16px;
+      cursor:pointer;
+      font-weight:1000;
+      letter-spacing:.2px;
+      color:#052014;
+      background: linear-gradient(135deg, var(--green), var(--green2));
+      box-shadow: 0 16px 40px rgba(25,255,122,.20);
+      transition: transform .12s ease, filter .12s ease;
+    }
+    .btn:hover{ transform: translateY(-1px); filter: brightness(1.05); }
+    .btn:active{ transform: translateY(0px); }
+    .btn.secondary{
+      background: rgba(255,255,255,.06);
+      color: var(--text);
+      border:1px solid rgba(255,255,255,.12);
+      box-shadow:none;
+      margin-top:10px;
+    }
+    .row2{
+      display:grid; grid-template-columns:1fr 1fr; gap:10px;
+    }
+    @media (max-width: 480px){ .row2{ grid-template-columns:1fr; } }
+
+    .status{
+      margin-top:12px;
+      color: rgba(233,242,255,.85);
+      font-size:13px;
+      min-height: 18px;
+    }
+    .pill{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:10px 12px;
+      border-radius:999px;
+      background: rgba(0,0,0,.25);
+      border:1px solid rgba(255,255,255,.10);
+      color: rgba(233,242,255,.92);
+      font-weight:900;
+      font-size:13px;
+      margin-top:10px;
+    }
+    .lock{
+      width:16px; height:16px; border-radius:5px;
+      background: rgba(25,255,122,.22);
+      border:1px solid rgba(25,255,122,.35);
+      display:inline-flex; align-items:center; justify-content:center;
+      color: var(--green);
+      font-weight:1000;
+    }
+
+    .right-note{
+      margin-top:14px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height:1.8;
+    }
+
+    /* two "pages" */
+    .page{ display:none; }
+    .page.show{ display:block; }
+    .top-action{
+      display:flex; justify-content:flex-end; margin-bottom:14px;
+    }
+    .linkBtn{
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.05);
+      color: var(--text);
+      padding:10px 12px;
+      border-radius: 14px;
+      cursor:pointer;
+      font-weight:1000;
+    }
+    .linkBtn:hover{ filter: brightness(1.08); }
+    .linkBtn:active{ transform: translateY(1px); }
   </style>
 </head>
+
 <body>
-<div class="wrap">
+  <div class="bg-glow"></div>
+  <div class="grid"></div>
 
-  <div class="card">
-    <h2 class="topTitle">پنل سایت</h2>
-    <div id="timerLine" class="muted"></div>
-
-    <!-- بخش لاگین -->
-    <div id="loginBox">
-      <div class="row">
-        <div>
-          <label class="small">نام کاربری</label>
-          <input id="username" placeholder="مثلاً Steve123" autocomplete="username" />
+  <div class="wrap">
+    <div class="shell">
+      <section class="hero">
+        <div class="brand">
+          <div class="logo">Z</div>
+          <div>
+            <h1 class="title">ZRX_LAND</h1>
+            <div class="subtitle">ورود امن • سشن ۱۰ دقیقه‌ای • ذخیره با localStorage</div>
+          </div>
         </div>
-        <div>
-          <label class="small">پسورد</label>
-          <input id="password" type="password" placeholder="پسورد اکانت" autocomplete="current-password" />
+
+        <div class="tag">
+          <span class="dot"></span>
+          <span>بعد از رفرش هم تا ۱۰ دقیقه قطع نمی‌شه ✅</span>
         </div>
-      </div>
 
-      <button id="btnLogin" class="ok" style="margin-top:12px;">ورود</button>
+        <div class="subtitle" style="margin-top:16px">
+          دکمه ورود که بزنی می‌ری داخل فرم لاگین. بعد از ورود، وارد حساب می‌شی.
+        </div>
+      </section>
 
-      <button id="btnCreate" class="ok" style="margin-top:10px;">ساخت اکانت</button>
-      <button id="btnClear" class="danger" style="margin-top:10px;">پاک کردن همه (فقط تست)</button>
+      <aside class="card">
+        <div class="card-inner">
+          <div class="top-action">
+            <button class="linkBtn" id="goLogin">ورود</button>
+          </div>
 
-      <div id="status" class="muted"></div>
-    </div>
+          <!-- PAGE: LOGIN -->
+          <div class="page show" id="pageLogin">
+            <div class="card-top">
+              <div class="brandText">ZRX_LAND</div>
+              <div class="hint">نام کاربری رو هر چی دوست داری (مثلاً Minecraft) بزن، بعد پسورد اکانتت رو وارد کن.</div>
+              <div class="pill"><span class="lock">🔒</span> سشن تا ۱۰ دقیقه نگه داشته می‌شود</div>
+            </div>
 
-    <!-- بخش وارد شده -->
-    <div id="appBox" class="hidden">
-      <div class="small">✅ وارد شده‌اید به عنوان:</div>
-      <div style="font-weight:900;margin-top:6px;font-size:18px" id="who"></div>
+            <div class="field">
+              <label>نام کاربری</label>
+              <input id="username" placeholder="مثلاً WardenSteve" autocomplete="username" />
+            </div>
 
-      <div class="muted" style="margin-top:10px">
-        تا <b id="exp"></b> زمان باقی مانده.
-      </div>
+            <div class="field">
+              <label>رمز عبور</label>
+              <input id="password" type="password" placeholder="پسورد اکانتتون" autocomplete="current-password" />
+            </div>
 
-      <div style="margin-top:14px;padding:12px;border:1px dashed #2a3b63;border-radius:12px">
-        محتوای اصلی سایت همینجاست… (هرچی می‌خوای اینجا بذار)
-      </div>
+            <button class="btn" id="btnSubmit">ورود / ساخت اکانت</button>
 
-      <button id="btnLogout" class="danger" style="margin-top:14px; width:auto; padding:10px 14px;">خروج</button>
+            <div class="row2">
+              <button class="btn secondary" id="btnCreateOnly">فقط ساخت اکانت</button>
+              <button class="btn secondary" id="btnLogout" title="فقط سشن را پاک می‌کند">خروج</button>
+            </div>
+
+            <div class="row2" style="margin-top:10px">
+              <button class="btn secondary" id="btnDeleteAccount" title="اکانت را از localStorage حذف می‌کند">حذف اکانت</button>
+              <button class="btn secondary" id="btnClearAll" title="همه چیز را پاک می‌کند (تست)">پاک کردن همه</button>
+            </div>
+
+            <div class="status" id="status"></div>
+
+            <div class="right-note">
+              اگر هنوز اکانت نساختی: با همین دکمه “ورود / ساخت اکانت” اول اکانت ساخته می‌شود و بعد لاگین می‌شی.
+            </div>
+          </div>
+
+          <!-- PAGE: PANEL (LOGGED IN) -->
+          <div class="page" id="pagePanel">
+            <div class="card-top">
+              <div class="brandText">✅ وارد شدید</div>
+              <div class="hint">تا پایان زمان سشن اجازه دسترسی دارید.</div>
+              <div class="pill"><span class="lock">⚡</span> دسترسی فعال</div>
+            </div>
+
+            <div class="status" style="min-height:auto">
+              <div style="font-weight:1000; font-size:14px;">کاربر: <span id="who"></span></div>
+              <div style="margin-top:6px; color:rgba(233,242,255,.78); font-size:13px;">
+                پایان سشن: <span id="exp"></span>
+              </div>
+            </div>
+
+            <button class="btn" id="btnGoHome">رفتن به صفحه اصلی</button>
+            <button class="btn secondary" id="btnLogout2">خروج</button>
+
+            <div class="right-note">
+              بعد از ۱۰ دقیقه سشن خودکار قفل می‌شود و باید دوباره لاگین کنی.
+            </div>
+          </div>
+
+        </div>
+      </aside>
     </div>
   </div>
 
-</div>
-
 <script>
-  const LS_USERS = "site:users:v1";
-  const LS_SESSION = "site:session:v1";
-  const SESSION_TTL_MS = 10 * 60 * 1000; // 10 دقیقه
+  // ====== Storage keys ======
+  const LS_USERS = "zrx:users:v1";
+  const LS_SESSION = "zrx:session:v1";
+  const TTL_MS = 10 * 60 * 1000; // 10 minutes
 
   const $ = (id) => document.getElementById(id);
 
-  function setStatus(t){ $("status").textContent = t || ""; }
+  const pageLogin = $("pageLogin");
+  const pagePanel = $("pagePanel");
 
-  function now(){ return Date.now(); }
+  function showLogin(){
+    pagePanel.classList.remove("show");
+    pageLogin.classList.add("show");
+  }
+  function showPanel(){
+    pageLogin.classList.remove("show");
+    pagePanel.classList.add("show");
+  }
+
+  function status(msg){
+    $("status").textContent = msg || "";
+  }
 
   function loadUsers(){
     const raw = localStorage.getItem(LS_USERS);
@@ -84,7 +378,9 @@
     try{
       const obj = JSON.parse(raw);
       return (obj && typeof obj === "object") ? obj : {};
-    }catch{ return {}; }
+    }catch{
+      return {};
+    }
   }
 
   function saveUsers(users){
@@ -94,7 +390,11 @@
   function loadSession(){
     const raw = localStorage.getItem(LS_SESSION);
     if(!raw) return null;
-    try{ return JSON.parse(raw); }catch{ return null; }
+    try{
+      return JSON.parse(raw);
+    }catch{
+      return null;
+    }
   }
 
   function saveSession(sess){
@@ -105,109 +405,182 @@
     localStorage.removeItem(LS_SESSION);
   }
 
-  function clearAll(){
-    localStorage.removeItem(LS_USERS);
-    localStorage.removeItem(LS_SESSION);
-  }
-
   async function sha256(text){
-    const enc = new TextEncoder().encode(text);
-    const buf = await crypto.subtle.digest("SHA-256", enc);
-    return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2,"0")).join("");
+    const data = new TextEncoder().encode(text);
+    const hashBuf = await crypto.subtle.digest("SHA-256", data);
+    return [...new Uint8Array(hashBuf)].map(b => b.toString(16).padStart(2,"0")).join("");
   }
 
-  function render(){
-    const sess = loadSession();
-
-    const loginBox = $("loginBox");
-    const appBox = $("appBox");
-    const expLine = $("timerLine");
-
-    if(!sess || !sess.username || !sess.expAt){
-      loginBox.classList.remove("hidden");
-      appBox.classList.add("hidden");
-      expLine.textContent = "";
-      setStatus("");
-      return;
-    }
-
-    const expAt = Number(sess.expAt);
-
-    if(!Number.isFinite(expAt) || now() > expAt){
-      clearSession();
-      loginBox.classList.remove("hidden");
-      appBox.classList.add("hidden");
-      expLine.textContent = "";
-      $("who").textContent = "";
-      $("exp").textContent = "";
-      setStatus("سشن منقضی شد. دوباره وارد شوید.");
-      return;
-    }
-
-    loginBox.classList.add("hidden");
-    appBox.classList.remove("hidden");
-    $("who").textContent = sess.username;
-    $("exp").textContent = new Date(expAt).toLocaleString("fa-IR");
-
-    // نمایش تایمر
-    const remainMs = expAt - now();
-    const s = Math.max(0, Math.floor(remainMs/1000));
-    const m = Math.floor(s/60);
-    const sec = (s%60).toString().padStart(2,"0");
-    expLine.textContent = `زمان باقی‌مانده: ${m} دقیقه و ${sec} ثانیه`;
-    setStatus("");
+  function isExpired(expAt){
+    const t = Number(expAt);
+    return !Number.isFinite(t) || Date.now() > t;
   }
 
-  // در هر بار refresh، همین که صفحه بالا آمد render می‌کنه
-  render();
-  setInterval(render, 1000);
-
-  $("btnLogin").addEventListener("click", async ()=>{
+  async function handleSubmit({ mode }) {
     const username = $("username").value.trim();
     const password = $("password").value;
 
-    if(!username){ setStatus("نام کاربری را وارد کن."); return; }
-    if(!password){ setStatus("پسورد را وارد کن."); return; }
+    if(!username){
+      status("نام کاربری را وارد کن.");
+      return;
+    }
+    if(!password || password.length < 1){
+      status("رمز عبور را وارد کن.");
+      return;
+    }
 
     const users = loadUsers();
-    const u = users[username];
-    if(!u){ setStatus("اکانت پیدا نشد. یا اول بساز."); return; }
+    const exists = !!users[username];
 
-    const hash = await sha256(password);
-    if(hash !== u.passHash){ setStatus("پسورد اشتباه است."); return; }
+    // mode: "createOnly" | "loginOrCreate"
+    if(mode === "createOnly"){
+      if(exists){
+        status("این اکانت قبلاً ساخته شده است. اول ورود کن یا اکانت را حذف کن.");
+        return;
+      }
+      const passHash = await sha256(password);
+      users[username] = { passHash, createdAt: new Date().toISOString() };
+      saveUsers(users);
+      saveSession({ username, expAt: Date.now() + TTL_MS });
+      status("اکانت ساخته شد ✅ و وارد شدی.");
+      showPanel();
+      return;
+    }
 
-    saveSession({ username, expAt: now() + SESSION_TTL_MS });
-    render();
+    // loginOrCreate
+    if(!exists){
+      // اگر ساخته نشده: بساز و وارد شو
+      const passHash = await sha256(password);
+      users[username] = { passHash, createdAt: new Date().toISOString() };
+      saveUsers(users);
+      saveSession({ username, expAt: Date.now() + TTL_MS });
+      status("اکانت ساخته شد ✅ وارد شدی.");
+      showPanel();
+      return;
+    } else {
+      // exists: login
+      const passHash = await sha256(password);
+      if(passHash !== users[username].passHash){
+        status("پسورد اشتباه است ❌");
+        return;
+      }
+      saveSession({ username, expAt: Date.now() + TTL_MS });
+      status("ورود موفق ✅");
+      showPanel();
+      return;
+    }
+  }
+
+  function renderPanel(){
+    const sess = loadSession();
+    if(!sess || !sess.username || !sess.expAt || isExpired(sess.expAt)){
+      clearSession();
+      status("سشن منقضی شد. دوباره لاگین کن.");
+      showLogin();
+      return;
+    }
+
+    $("who").textContent = sess.username;
+    $("exp").textContent = new Date(Number(sess.expAt)).toLocaleString("fa-IR");
+
+    // tick
+    if(!renderPanel._timer){
+      renderPanel._timer = setInterval(() => {
+        const s = loadSession();
+        if(!s || !s.username || !s.expAt || isExpired(s.expAt)){
+          clearSession();
+          status("سشن منقضی شد. دوباره لاگین کن.");
+          showLogin();
+          return;
+        }
+        $("exp").textContent = new Date(Number(s.expAt)).toLocaleString("fa-IR");
+      }, 1000);
+    }
+  }
+
+  // ====== Buttons ======
+  $("goLogin").addEventListener("click", () => {
+    // فقط بیاد فرم لاگین (مثل عکس: بعد رفرش باید هنوز لاگین باشه)
+    // پس این دکمه پنل رو قفل نمی‌کنه، فقط صفحه لاگین رو میاره.
+    showLogin();
+    status("");
   });
 
-  $("btnCreate").addEventListener("click", async ()=>{
-    const username = $("username").value.trim();
-    const password = $("password").value;
+  $("btnSubmit").addEventListener("click", () => handleSubmit({ mode: "loginOrCreate" }));
+  $("btnCreateOnly").addEventListener("click", () => handleSubmit({ mode: "createOnly" }));
 
-    if(username.length < 3){ setStatus("نام کاربری حداقل ۳ کاراکتر باشد."); return; }
-    if(password.length < 4){ setStatus("پسورد حداقل ۴ کاراکتر باشد."); return; }
+  $("btnLogout").addEventListener("click", () => {
+    clearSession();
+    status("خارج شدی 👋");
+    showLogin();
+  });
+
+  $("btnLogout2").addEventListener("click", () => {
+    clearSession();
+    status("خارج شدی 👋");
+    showLogin();
+  });
+
+  $("btnGoHome").addEventListener("click", () => {
+    // “رفتن به صفحه اصلی” = فقط برگشت به لاگین/صفحه اول
+    showLogin();
+  });
+
+  $("btnDeleteAccount").addEventListener("click", async () => {
+    const username = $("username").value.trim();
+    if(!username){ status("نام کاربری را اول وارد کن."); return; }
 
     const users = loadUsers();
-    if(users[username]){ setStatus("این نام کاربری قبلاً ساخته شده است."); return; }
+    if(!users[username]){ status("اکانت پیدا نشد."); return; }
 
-    const hash = await sha256(password);
-    users[username] = { passHash: hash, createdAt: new Date().toISOString() };
+    // (اختیاری) برای اینکه کسی نتونه اکانت رو با فقط وارد کردن یوزر پاک کنه، پسورد هم باید درست باشه
+    const password = $("password").value;
+    if(!password){ status("برای حذف اکانت، رمز عبور را هم وارد کن."); return; }
+
+    const passHash = await sha256(password);
+    if(passHash !== users[username].passHash){
+      status("پسورد برای حذف اکانت اشتباه است ❌");
+      return;
+    }
+
+    delete users[username];
     saveUsers(users);
 
-    setStatus("اکانت ساخته شد ✅ حالا وارد شو.");
+    // اگر همین سشن بوده پاکش کن
+    const sess = loadSession();
+    if(sess && sess.username === username) clearSession();
+
+    status("اکانت حذف شد ✅");
+    showLogin();
   });
 
-  $("btnLogout").addEventListener("click", ()=>{
-    clearSession();
-    render();
+  $("btnClearAll").addEventListener("click", () => {
+    if(!confirm("همه اکانت‌ها و سشن پاک شود؟ (فقط تست)")) return;
+    localStorage.removeItem(LS_USERS);
+    localStorage.removeItem(LS_SESSION);
+    status("همه پاک شد ✅");
+    showLogin();
   });
 
-  $("btnClear").addEventListener("click", ()=>{
-    if(confirm("همه اکانت‌ها و سشن‌ها پاک می‌شود؟ (فقط تست)")){
-      clearAll();
-      render();
+  // ====== Init ======
+  (function init(){
+    const sess = loadSession();
+    if(sess && sess.username && sess.expAt && !isExpired(sess.expAt)){
+      showPanel();
+      status("");
+      renderPanel();
+    }else{
+      showLogin();
+      status("");
     }
-  });
+
+    // اگر سشن در تب/پنجره دیگری تغییر کرد
+    window.addEventListener("storage", (e) => {
+      if(e.key === LS_SESSION){
+        renderPanel();
+      }
+    });
+  })();
 </script>
 </body>
 </html>
