@@ -1,0 +1,211 @@
+/* ===== ZRX_LAND Neon FX ===== */
+:root{
+  --glow: rgba(25,255,122,.55);
+  --glow2: rgba(0,216,107,.45);
+  --cardBorder: rgba(255,255,255,.10);
+  --text: #e9f2ff;
+}
+
+@media (prefers-reduced-motion: reduce){
+  * { animation: none !important; transition: none !important; }
+}
+
+/* ===== Base polish ===== */
+body{
+  color: var(--text);
+}
+
+.card{
+  border:1px solid var(--cardBorder);
+  position:relative;
+  overflow:hidden;
+  transform: translateZ(0);
+}
+
+/* ===== moving gradient highlight ===== */
+.card::before{
+  content:"";
+  position:absolute;
+  inset:-2px;
+  background:
+    radial-gradient(800px 280px at 15% -10%, rgba(25,255,122,.25), transparent 60%),
+    radial-gradient(600px 260px at 95% 0%, rgba(0,216,107,.22), transparent 60%),
+    linear-gradient(120deg, rgba(255,255,255,.06), transparent 35%, rgba(255,255,255,.06));
+  opacity:.95;
+  animation: sweep 5.5s ease-in-out infinite;
+  pointer-events:none;
+  filter: blur(0px);
+}
+
+.card::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.00));
+  pointer-events:none;
+}
+
+@keyframes sweep{
+  0%   { transform: translateX(-12%) translateY(-2%) rotate(-2deg); }
+  50%  { transform: translateX(10%) translateY(2%) rotate(2deg); }
+  100% { transform: translateX(-12%) translateY(-2%) rotate(-2deg); }
+}
+
+/* ===== Neon text shimmer ===== */
+.brandText, .title, .card-top .brandText{
+  position:relative;
+}
+
+.brandText::after,
+.title::after{
+  content:"";
+  position:absolute;
+  left:-10%;
+  top:-20%;
+  width:120%;
+  height:140%;
+  background: linear-gradient(90deg, transparent, rgba(25,255,122,.45), transparent);
+  transform: translateX(-120%);
+  animation: neonShine 2.8s ease-in-out infinite;
+  pointer-events:none;
+  mix-blend-mode: screen;
+}
+
+@keyframes neonShine{
+  0%, 60% { transform: translateX(-120%); opacity: 0; }
+  70% { opacity: .95; }
+  100% { transform: translateX(120%); opacity: 0; }
+}
+
+/* ===== Page transitions ===== */
+.page{
+  animation: pageIn .45s cubic-bezier(.2,.9,.2,1) both;
+}
+
+@keyframes pageIn{
+  from { opacity:0; transform: translateY(10px) scale(.98); filter: blur(2px); }
+  to   { opacity:1; transform: translateY(0) scale(1); filter: blur(0); }
+}
+
+/* ===== Login / Panel fade + glow ===== */
+.hidden{
+  display:none !important;
+}
+
+/* ===== Button glow + click ripple feel ===== */
+.btn{
+  position:relative;
+}
+
+.btn::before{
+  content:"";
+  position:absolute;
+  inset:-2px;
+  border-radius:inherit;
+  background: radial-gradient(circle at 30% 20%, rgba(25,255,122,.35), transparent 55%);
+  opacity:0;
+  transition: opacity .2s ease;
+  pointer-events:none;
+}
+
+.btn:hover::before{
+  opacity:1;
+}
+
+.btn:hover{
+  animation: hoverFloat .8s ease-in-out infinite;
+}
+
+@keyframes hoverFloat{
+  0%,100%{ transform: translateY(-1px); }
+  50%{ transform: translateY(-3px); }
+}
+
+.btn:active{
+  animation: none;
+  transform: translateY(0px) scale(.99);
+}
+
+/* ===== Secondary button pulse ===== */
+.btn.secondary{
+  transition: transform .12s ease, filter .12s ease, box-shadow .12s ease;
+}
+
+.btn.secondary:hover{
+  filter: brightness(1.08);
+  box-shadow: 0 0 0 1px rgba(255,255,255,.06), 0 0 30px rgba(25,255,122,.12);
+}
+
+/* ===== Input focus neon ===== */
+input:focus{
+  border-color: rgba(25,255,122,.35) !important;
+  box-shadow:
+    0 0 0 3px rgba(25,255,122,.14),
+    inset 0 0 0 1px rgba(0,0,0,.18);
+  transform: translateY(-1px);
+  transition: .2s ease;
+}
+
+/* ===== Status toast pop ===== */
+#status{
+  animation: statusPop .25s ease both;
+}
+
+@keyframes statusPop{
+  from{ opacity:0; transform: translateY(6px); filter: blur(1px); }
+  to{ opacity:1; transform: translateY(0); filter: blur(0); }
+}
+
+/* ===== Lock icon / pill ===== */
+.pill{
+  position:relative;
+}
+
+.pill::before{
+  content:"";
+  position:absolute;
+  inset:-1px;
+  border-radius:999px;
+  background: linear-gradient(90deg, transparent, rgba(25,255,122,.25), transparent);
+  opacity:.0;
+  transition: opacity .2s ease;
+  pointer-events:none;
+}
+
+.pill:hover::before{
+  opacity:.9;
+}
+
+/* ===== grid / background add extra sparkle ===== */
+.grid{
+  animation: gridMove 7s linear infinite;
+}
+
+@keyframes gridMove{
+  0%{ transform: perspective(900px) rotateX(58deg) translateY(120px) translateX(0); }
+  100%{ transform: perspective(900px) rotateX(58deg) translateY(120px) translateX(-60px); }
+}
+
+/* ===== subtle shake on error (if you set status red later) ===== */
+/* فقط اگر خواستی در JS کلاس اضافه کنی: .err */
+.err{
+  animation: errShake .25s ease-in-out 1;
+}
+@keyframes errShake{
+  0%{ transform: translateX(0); }
+  25%{ transform: translateX(-4px); }
+  50%{ transform: translateX(4px); }
+  75%{ transform: translateX(-2px); }
+  100%{ transform: translateX(0); }
+}
+
+/* ===== Make "Z" logo more punchy ===== */
+.logo{
+  animation: logoPulse 2.4s ease-in-out infinite;
+}
+
+@keyframes logoPulse{
+  0%,100%{ transform: scale(1); filter: drop-shadow(0 0 18px rgba(25,255,122,.18)); }
+  50%{ transform: scale(1.05); filter: drop-shadow(0 0 30px rgba(25,255,122,.35)); }
+}
