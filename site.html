@@ -567,6 +567,68 @@
 
     const $ = (id)=>document.getElementById(id);
 
+    // ==== اضافه شد: تبدیل نام‌ها به ZRXMINE (متن HTML) ====
+    const NAME_REPLACEMENTS = {
+      "zrxmine": "ZRXMINE",
+      "zrxMine": "ZRXMINE",
+      "zRxmine": "ZRXMINE",
+      "Zrxmine": "ZRXMINE",
+      "ZrXmine": "ZRXMINE",
+      "ZRXmine": "ZRXMINE",
+      "ZRXMine": "ZRXMINE",
+      "ZRXMINE": "ZRXMINE"
+    };
+
+    function normalizeToZRXMINE(str){
+      if (typeof str !== "string") return str;
+      const key = str.trim();
+      // حساس به حروف نیست (چند حالت رایج را پوشش دادیم)
+      const direct = NAME_REPLACEMENTS[key];
+      if (direct) return direct;
+
+      // اگر فقط می‌خوای هر شکلی از این عبارت رو به ZRXMINE تبدیل کنی
+      // (حتی اگر فاصله داشت یا بخشی از متن بود)
+      // - برای جلوگیری از تغییر بی‌مورد، فقط وقتی کل کلمه/عبارت برابر است انجام می‌دهیم
+      return str;
+    }
+
+    function replaceInNode(node){
+      if (!node) return;
+
+      if (node.nodeType === Node.TEXT_NODE) {
+        let t = node.nodeValue;
+
+        // فقط جایگزینی‌های دقیق "کل عبارت"؛ اگر می‌خوای زیررشته‌ای هم عوض شه بگو
+        const parts = t.split(/(\b)/); // کمک برای حفظ مرز کلمات
+        // روش ساده‌تر: حالت‌های رایج رو با regex کل متن انجام می‌دیم
+        const re = /\b(ZrXmine|Zrxmine|zrxmine|ZRXMINE|ZRXMine|ZRXmine|ZRXmine|zRxmine)\b/gi;
+        t = t.replace(re, "ZRXMINE");
+
+        node.nodeValue = t;
+        return;
+      }
+
+      if (node.nodeType === Node.ELEMENT_NODE) {
+        for (const child of node.childNodes) replaceInNode(child);
+      }
+    }
+
+    function applyZRXMINEToPage(root=document.body){
+      replaceInNode(root);
+
+      // همچنین روی المان‌های مهمی که با textContent پر می‌شن، محافظه‌کارانه اعمال می‌کنیم
+      ["usernameTxt","pName"].forEach(id=>{
+        const el = document.getElementById(id);
+        if (el && el.textContent) el.textContent = normalizeToZRXMINE(el.textContent) || el.textContent;
+      });
+      const avatar = $("avatarTxt");
+      if (avatar && avatar.textContent) {
+        const v = avatar.textContent.trim();
+        if (v === "ZRXMINE" || v.toLowerCase() === "zrxmine") avatar.textContent = "ZRXMINE";
+      }
+    }
+    // ==== پایان اضافه شد ====
+
     function safeUsers(){
       const raw = localStorage.getItem(LS_USERS);
       if(!raw) return {};
@@ -612,6 +674,9 @@
         $("avatarTxt").textContent = (firstUser[0] || "U").toUpperCase();
         $("statusTxt").textContent = "اکانت آماده";
       }
+
+      // اعمال تبدیل بعد از رندر
+      applyZRXMINEToPage(document.body);
     }
 
     let panelTimer = null;
@@ -629,7 +694,9 @@
       const reg = localStorage.getItem(LS_DATE);
 
       $("pRank").textContent = rank || "-";
-      $("pName").textContent = name || "-";
+
+      // اینجا هم مستقیم روی نام اعمال می‌کنیم
+      $("pName").textContent = normalizeToZRXMINE(name) || name || "-";
 
       const regDate = reg ? new Date(reg) : null;
       const ok = regDate && !isNaN(regDate.getTime());
@@ -645,6 +712,9 @@
       update();
       panelTimer = setInterval(update, 1000);
       $("panelDetails").classList.add("show");
+
+      // اعمال تبدیل در کل صفحه
+      applyZRXMINEToPage(document.body);
     }
 
     function setTab(tab){
@@ -665,6 +735,9 @@
         $("panelText").textContent = "رنک خریداری شده و مدت حضور.";
         renderPanel();
       }
+
+      // چون با تغییر تب متن‌ها عوض می‌شن، دوباره اعمال کن
+      applyZRXMINEToPage(document.body);
     }
 
     document.querySelectorAll('#shopSection button[data-rank]').forEach(btn=>{
@@ -691,6 +764,9 @@
 
     renderHeader();
     setTab("shop");
+
+    // یکبار هم بعد از لود کامل اعمال کن
+    window.addEventListener("load", ()=> applyZRXMINEToPage(document.body));
   </script>
 </body>
 </html>
