@@ -13,19 +13,12 @@
       --stroke: rgba(255,255,255,.10);
       --text:#eaf2ff;
       --muted: rgba(234,242,255,.68);
-
       --blue:#2f8cff;
       --blue2:#1f6fff;
-
-      --green:#17ff7b;
-      --red:#ff4d5a;
-      --gray:#1a2433;
-
       --shadow: 0 22px 90px rgba(0,0,0,.55);
       --radius: 22px;
       --radius2: 16px;
     }
-
     *{box-sizing:border-box}
     body{
       margin:0;
@@ -33,7 +26,6 @@
       color:var(--text);
       min-height:100vh;
       overflow-x:hidden;
-
       background:
         radial-gradient(900px 500px at 70% 10%, rgba(47,140,255,.20), transparent 60%),
         radial-gradient(700px 420px at 20% 30%, rgba(23,255,123,.12), transparent 55%),
@@ -199,7 +191,6 @@
       font-weight:1000;
     }
 
-    /* tabs */
     .tabs{
       display:grid;
       grid-template-columns: 1fr 1fr 1fr;
@@ -250,9 +241,9 @@
       box-shadow: 0 0 0 1px rgba(47,140,255,.12), 0 20px 70px rgba(47,140,255,.18);
       color:#06110d;
     }
+
     .tabBtn.active::after{ opacity:1; }
 
-    /* content area */
     .panelArea{
       margin-top:14px;
       background: rgba(0,0,0,.18);
@@ -300,68 +291,16 @@
       display:inline-block;
     }
 
-    /* فروشگاه پایین صفحه + پنل */
-    .shopGrid{
-      display:flex;
-      gap:12px;
-      flex-wrap:wrap;
-      margin-top:12px;
-    }
-    .shopCard{
-      flex: 1 1 220px;
-      border:1px solid rgba(255,255,255,.10);
-      border-radius:14px;
-      background: rgba(255,255,255,.03);
-      padding:14px;
-      min-width:220px;
-      position:relative;
-      overflow:hidden;
-    }
-    .shopCard::after{
-      content:"";
-      position:absolute;
-      inset:-2px;
-      background: radial-gradient(420px 140px at 40% 0%, rgba(47,140,255,.20), transparent 62%);
-      opacity:.6;
-      pointer-events:none;
-    }
-    .shopCard b{ position:relative; z-index:1; font-size:15px; }
-    .shopCard .desc{ position:relative; z-index:1; margin-top:8px; color:var(--muted); font-size:12px; line-height:1.8; }
-
-    .btn{
-      border:0;
-      cursor:pointer;
-      padding:12px 14px;
-      border-radius:14px;
-      font-weight:1000;
-      letter-spacing:.2px;
-      background: rgba(255,255,255,.04);
-      color: rgba(234,242,255,.92);
-      border:1px solid rgba(255,255,255,.10);
-      transition: transform .15s ease, filter .15s ease;
-      position:relative;
-      z-index:1;
-      width:100%;
-      margin-top:12px;
-    }
-    .btn:hover{ transform: translateY(-2px); filter: brightness(1.05); }
-
-    .btn.primary{
-      background: linear-gradient(135deg, rgba(47,140,255,.95), rgba(31,111,255,.55));
-      border-color: rgba(47,140,255,.55);
-      color:#06110d;
-      box-shadow: 0 18px 50px rgba(47,140,255,.18);
-    }
-
     .panelDetails{
       margin-top:14px;
-      border:1px solid rgba(0,229,255,.35);
-      border-radius:16px;
+      border: 1px solid rgba(0,229,255,.35);
+      border-radius: 16px;
       padding:14px;
       background: rgba(0,0,0,.18);
       display:none;
     }
-    .panelDetails h4{ margin:0 0 10px; font-size:16px; font-weight:1000; }
+    .panelDetails.show{ display:block; }
+
     .panelLine{
       display:flex;
       justify-content:space-between;
@@ -374,11 +313,116 @@
     .panelLine:last-child{ border-bottom:0; }
     .panelLine span:last-child{ color: rgba(234,242,255,.95); font-weight:1000; }
 
+    .shopSection{
+      margin-top:14px;
+    }
+    .shopGrid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:12px;
+      margin-top:10px;
+    }
+
+    .shopCard{
+      border:1px solid rgba(255,255,255,.10);
+      border-radius: 18px;
+      background: rgba(255,255,255,.03);
+      padding:14px;
+      position:relative;
+      overflow:hidden;
+      min-height: 210px;
+    }
+
+    .shopCard::after{
+      content:"";
+      position:absolute; inset:-2px;
+      background: radial-gradient(380px 120px at 40% 0%, rgba(47,140,255,.18), transparent 62%);
+      opacity:.9;
+      pointer-events:none;
+    }
+
+    .shopCard > *{ position:relative; z-index:1; }
+
+    .rankTitle{
+      font-weight:1000;
+      font-size:16px;
+      margin-bottom:6px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+    }
+
+    .rankTag{
+      font-size:12px;
+      color:#06110d;
+      font-weight:1000;
+      padding:6px 10px;
+      border-radius:999px;
+      background: linear-gradient(135deg, rgba(47,140,255,.95), rgba(31,111,255,.55));
+      border:1px solid rgba(47,140,255,.55);
+      box-shadow: 0 18px 50px rgba(47,140,255,.14);
+      white-space:nowrap;
+    }
+
+    .checkList{
+      margin:10px 0 0;
+      padding:0;
+      list-style:none;
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+    }
+
+    .checkItem{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      color: var(--muted);
+      font-size:12px;
+      line-height:1.6;
+    }
+
+    .checkIcon{
+      width:22px;height:22px;border-radius:10px;
+      display:flex;align-items:center;justify-content:center;
+      background: rgba(47,140,255,.12);
+      border:1px solid rgba(47,140,255,.35);
+      box-shadow: 0 0 25px rgba(47,140,255,.15);
+      color: rgba(234,242,255,.95);
+      flex:0 0 auto;
+      font-size:13px;
+    }
+
+    .btn{
+      border:0;
+      cursor:pointer;
+      padding:12px 14px;
+      border-radius: 14px;
+      font-weight:1000;
+      letter-spacing:.2px;
+      background: rgba(255,255,255,.04);
+      color: rgba(234,242,255,.92);
+      border:1px solid rgba(255,255,255,.10);
+      transition: transform .15s ease, filter .15s ease, background .15s ease;
+      width:100%;
+      margin-top:14px;
+      user-select:none;
+    }
+    .btn:hover{ transform: translateY(-2px); filter: brightness(1.05); }
+    .btn.primary{
+      background: linear-gradient(135deg, rgba(47,140,255,.95), rgba(31,111,255,.55));
+      border-color: rgba(47,140,255,.55);
+      color:#06110d;
+      box-shadow: 0 18px 50px rgba(47,140,255,.18);
+    }
+
     @media (max-width: 720px){
       .userBar{ flex-direction:column; align-items:flex-start; }
       .stats{ justify-content:flex-start; gap:10px; flex-wrap:wrap; }
       .stat{ min-width: 150px; }
       .tabs{ grid-template-columns: 1fr; }
+      .shopGrid{ grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -389,6 +433,7 @@
   <div class="wrap">
     <div class="card">
       <div class="inner">
+
         <div class="header">
           <div class="logoWrap">
             <div class="logo">W</div>
@@ -431,38 +476,80 @@
         <div class="panelArea" id="panelArea">
           <h3 class="panelTitle" id="panelTitle">فروشگاه</h3>
           <p class="panelText" id="panelText">
-            اینجا می‌تونی بخش فروشگاه رو بذاری. الان فقط UI هست.
+            پایین صفحه پلن/رنک‌ها هست.
           </p>
-          <div class="badge"><i></i> روی دکمه‌ها کلیک کن</div>
 
-          <div style="margin-top:14px; color:rgba(234,242,255,.75); font-size:12px; line-height:1.9">
-            اگر اکانت ساخته نشده باشد، دکمه «پنل» می‌تونه لینک به صفحه ورودت بده.
-          </div>
+          <div class="badge"><i></i> روی دکمه خرید کلیک کن</div>
 
-          <!-- ✅ فروشگاه پایین صفحه -->
-          <div id="shopSection" style="margin-top:14px; display:block;">
-            <div class="shopGrid">
-              <div class="shopCard">
-                <b>VIP / MVP</b>
-                <div class="desc">برای خرید کلیک کنید</div>
-                <button class="btn primary" data-rank="MVP">برای خرید کلیک کنید</button>
-              </div>
-
-              <div class="shopCard">
-                <b>V2</b>
-                <div class="desc">برای خرید کلیک کنید</div>
-                <button class="btn primary" data-rank="V2">برای خرید کلیک کنید</button>
-              </div>
-            </div>
-          </div>
-
-          <!-- ✅ پنل کاربر -->
           <div class="panelDetails" id="panelDetails">
-            <h4>پنل شما</h4>
+            <h4 style="margin:0 0 10px; font-size:18px;">پنل</h4>
             <div class="panelLine"><span>رنک خریداری شده</span><span id="pRank">-</span></div>
             <div class="panelLine"><span>مدت حضور در سایت تا الان</span><span id="pTime">-</span></div>
             <div class="panelLine"><span>اسم</span><span id="pName">-</span></div>
             <div class="panelLine"><span>تاریخ ثبت نام</span><span id="pDate">-</span></div>
+          </div>
+
+          <!-- فروشگاه پایین صفحه همیشه هست -->
+          <div class="shopSection">
+            <div class="shopGrid">
+              <!-- MVP -->
+              <div class="shopCard">
+                <div class="rankTitle">
+                  <span>MVP</span>
+                  <span class="rankTag">MVP</span>
+                </div>
+
+                <ul class="checkList">
+                  <li class="checkItem">
+                    <span class="checkIcon">✓</span>
+                    <span>دسترسی به پنل</span>
+                  </li>
+                  <li class="checkItem">
+                    <span class="checkIcon">✓</span>
+                    <span>مدت زمان VIP فعال</span>
+                  </li>
+                  <li class="checkItem">
+                    <span class="checkIcon">✓</span>
+                    <span>نمایش رنک در پنل</span>
+                  </li>
+                  <li class="checkItem">
+                    <span class="checkIcon">✓</span>
+                    <span>پشتیبانی محدود</span>
+                  </li>
+                </ul>
+
+                <button class="btn primary" data-rank="MVP">برای خرید کلیک کنید</button>
+              </div>
+
+              <!-- VIP / V2 -->
+              <div class="shopCard">
+                <div class="rankTitle">
+                  <span>VIP / V2</span>
+                  <span class="rankTag">VIP</span>
+                </div>
+
+                <ul class="checkList">
+                  <li class="checkItem">
+                    <span class="checkIcon">✓</span>
+                    <span>دسترسی کامل به پنل</span>
+                  </li>
+                  <li class="checkItem">
+                    <span class="checkIcon">✓</span>
+                    <span>مدت زمان طولانی‌تر</span>
+                  </li>
+                  <li class="checkItem">
+                    <span class="checkIcon">✓</span>
+                    <span>اولویت در رسیدگی</span>
+                  </li>
+                  <li class="checkItem">
+                    <span class="checkIcon">✓</span>
+                    <span>پشتیبانی قوی‌تر</span>
+                  </li>
+                </ul>
+
+                <button class="btn primary" data-rank="V2">برای خرید کلیک کنید</button>
+              </div>
+            </div>
           </div>
 
         </div>
@@ -472,17 +559,15 @@
   </div>
 
   <script>
-    // ===== محدودیت: فقط تا ۱ اکانت بسازه (سشن ۱۰ دقیقه‌ای حذف) =====
     const LS_USERS = "zrx:users:v1";
 
-    // ===== اطلاعات پنل/خرید (این‌ها را باید در صفحه ورود/ساخت هم ست کنی) =====
-    const LS_RANK = "zrx:rank:v1"; // MVP / V2
-    const LS_NAME = "zrx:name:v1"; // اسم کاربر
-    const LS_DATE = "zrx:reg:v1";  // ISO string تاریخ ثبت نام
+    const LS_RANK = "zrx:rank:v1";
+    const LS_NAME = "zrx:name:v1";
+    const LS_DATE = "zrx:reg:v1";
 
     const $ = (id)=>document.getElementById(id);
 
-    function loadUsers(){
+    function safeUsers(){
       const raw = localStorage.getItem(LS_USERS);
       if(!raw) return {};
       try{
@@ -493,56 +578,12 @@
       }
     }
 
-    function countUsers(users){
-      return Object.keys(users || {}).length;
-    }
-
-    const tabs = {
-      shop: {
-        title: "فروشگاه",
-        text: "اینجا می‌تونی آیتم‌ها/پلن‌ها رو بچینی."
-      },
-      ticket: {
-        title: "تیکت",
-        text: "اینجا بخش تیکته."
-      },
-      panel: {
-        title: "پنل",
-        text: "مشخصات خرید و زمان حضور شما."
-      }
-    };
-
-    function setActiveTab(tab){
-      document.querySelectorAll(".tabBtn").forEach(b=>{
-        b.classList.toggle("active", b.dataset.tab === tab);
-      });
-
-      const users = loadUsers();
-      const total = countUsers(users);
-
-      // پنل: اگر اکانت ساخته نشده بود
-      if(tab === "panel" && total < 1){
-        $("panelTitle").textContent = tabs.panel.title;
-        $("panelText").textContent = "برای ورود به پنل، اول باید اکانت بسازی (فقط ۱ اکانت).";
-        $("panelDetails").style.display = "none";
-        return;
-      }
-
-      $("panelTitle").textContent = tabs[tab].title;
-      $("panelText").textContent = tabs[tab].text;
-
-      // نمایش/عدم نمایش جزئیات پنل
-      if(tab === "panel"){
-        renderPanelDetails();
-      }else{
-        $("panelDetails").style.display = "none";
-      }
-
-      $("panelArea").querySelector(".badge").innerHTML = `<i></i> دسترسی اوکی`;
+    function countUsers(obj){
+      return Object.keys(obj || {}).length;
     }
 
     function formatTime(ms){
-      if(ms < 0 || !Number.isFinite(ms)) return "-";
+      if(!Number.isFinite(ms) || ms < 0) return "-";
       const s = Math.floor(ms/1000);
       const d = Math.floor(s/86400);
       const h = Math.floor((s%86400)/3600);
@@ -554,44 +595,9 @@
       return parts.join(" ");
     }
 
-    function renderPanelDetails(){
-      const rank = localStorage.getItem(LS_RANK);
-      const name = localStorage.getItem(LS_NAME) || "-";
-      const reg = localStorage.getItem(LS_DATE);
-
-      const panelDetails = $("panelDetails");
-
-      if(!rank || !reg){
-        panelDetails.style.display = "none";
-        $("panelTitle").textContent = "پنل";
-        $("panelText").textContent = "هنوز رنک/اطلاعات ثبت نام شما کامل نشده. از فروشگاه خرید انجام بده.";
-        return;
-      }
-
-      $("pRank").textContent = rank;
-      $("pName").textContent = name;
-
-      const regDate = new Date(reg);
-      $("pDate").textContent = isNaN(regDate.getTime()) ? "-" : regDate.toLocaleString("fa-IR");
-
-      const update = () => {
-        const ms = Date.now() - regDate.getTime();
-        $("pTime").textContent = formatTime(ms);
-      };
-      update();
-      panelDetails.style.display = "block";
-
-      // فقط یک interval فعال نگه داریم
-      if(window.__panelTimer){
-        clearInterval(window.__panelTimer);
-      }
-      window.__panelTimer = setInterval(update, 1000);
-    }
-
     function renderHeader(){
-      const users = loadUsers();
+      const users = safeUsers();
       const total = countUsers(users);
-
       $("countUsersTxt").textContent = total;
 
       if(total < 1){
@@ -608,32 +614,83 @@
       }
     }
 
-    // کلیک خرید: ذخیره رنک + (اگر اسم/تاریخ ثبت نام نداریم) فعلاً ست پیش‌فرض
+    let panelTimer = null;
+
+    function renderPanel(){
+      const users = safeUsers();
+      const total = countUsers(users);
+      if(total < 1){
+        $("panelDetails").classList.remove("show");
+        return;
+      }
+
+      const rank = localStorage.getItem(LS_RANK);
+      const name = localStorage.getItem(LS_NAME) || "-";
+      const reg = localStorage.getItem(LS_DATE);
+
+      $("pRank").textContent = rank || "-";
+      $("pName").textContent = name || "-";
+
+      const regDate = reg ? new Date(reg) : null;
+      const ok = regDate && !isNaN(regDate.getTime());
+
+      $("pDate").textContent = ok ? regDate.toLocaleString("fa-IR") : "-";
+
+      if(panelTimer) clearInterval(panelTimer);
+
+      const update = ()=>{
+        $("pTime").textContent = ok ? formatTime(Date.now() - regDate.getTime()) : "-";
+      };
+
+      update();
+      panelTimer = setInterval(update, 1000);
+      $("panelDetails").classList.add("show");
+    }
+
+    function setTab(tab){
+      document.querySelectorAll(".tabBtn").forEach(b=>{
+        b.classList.toggle("active", b.dataset.tab === tab);
+      });
+
+      if(tab === "shop"){
+        $("panelTitle").textContent = "فروشگاه";
+        $("panelText").textContent = "پایین صفحه پلن/رنک‌ها هست.";
+        $("panelDetails").classList.remove("show");
+      }else if(tab === "ticket"){
+        $("panelTitle").textContent = "تیکت";
+        $("panelText").textContent = "اینجا بخش تیکته.";
+        $("panelDetails").classList.remove("show");
+      }else if(tab === "panel"){
+        $("panelTitle").textContent = "پنل";
+        $("panelText").textContent = "رنک خریداری شده و مدت حضور.";
+        renderPanel();
+      }
+    }
+
     document.querySelectorAll('#shopSection button[data-rank]').forEach(btn=>{
       btn.addEventListener('click', ()=>{
         const r = btn.getAttribute('data-rank');
         localStorage.setItem(LS_RANK, r);
 
-        // اگر اسم و تاریخ از قبل ست نشده، اینجا نمی‌تونم اسم واقعی بدون سیستم ورودت داشته باشم
-        if(!localStorage.getItem(LS_NAME)) localStorage.setItem(LS_NAME, $("usernameTxt").textContent || "کاربر");
-        if(!localStorage.getItem(LS_DATE)) localStorage.setItem(LS_DATE, new Date().toISOString());
-
-        // اگر الان روی پنل هستی، نمایش بده
-        if(document.querySelector('.tabBtn.active')?.dataset.tab === "panel"){
-          renderPanelDetails();
+        if(!localStorage.getItem(LS_NAME)){
+          const nm = ($("usernameTxt").textContent || "کاربر").trim();
+          localStorage.setItem(LS_NAME, nm || "کاربر");
         }
+        if(!localStorage.getItem(LS_DATE)){
+          localStorage.setItem(LS_DATE, new Date().toISOString());
+        }
+
+        const active = document.querySelector(".tabBtn.active")?.dataset.tab;
+        if(active === "panel") renderPanel();
       });
     });
 
     document.querySelectorAll(".tabBtn").forEach(btn=>{
-      btn.addEventListener("click", ()=>{
-        const tab = btn.dataset.tab;
-        setActiveTab(tab);
-      });
+      btn.addEventListener("click", ()=> setTab(btn.dataset.tab));
     });
 
     renderHeader();
-    setActiveTab("shop");
+    setTab("shop");
   </script>
 </body>
 </html>
