@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>WARDENLAND | ZRX_LAND</title>
+  <title>ZRX_LAND</title>
 
   <style>
     :root{
@@ -34,7 +34,6 @@
       min-height:100vh;
       overflow-x:hidden;
 
-      /* پس‌زمینه شبیه عکس (هکس + نور) */
       background:
         radial-gradient(900px 500px at 70% 10%, rgba(47,140,255,.20), transparent 60%),
         radial-gradient(700px 420px at 20% 30%, rgba(23,255,123,.12), transparent 55%),
@@ -42,7 +41,6 @@
         linear-gradient(180deg, #070b12, #05070d);
     }
 
-    /* افکت هکس/کاغذ پس زمینه */
     .hexfield{
       position:fixed; inset:0;
       pointer-events:none;
@@ -60,7 +58,6 @@
       50%{ transform: translate3d(-12px,10px,0); }
     }
 
-    /* کارت مرکزی */
     .wrap{
       min-height:100vh;
       display:flex;
@@ -93,7 +90,6 @@
       padding:22px;
     }
 
-    /* هدر کارت */
     .header{
       display:flex;
       gap:14px;
@@ -144,7 +140,6 @@
       line-height:1.8;
     }
 
-    /* ناحیه آواتار/کاربر مثل عکس */
     .userBar{
       margin:12px auto 18px;
       width:min(720px, 100%);
@@ -204,7 +199,7 @@
       font-weight:1000;
     }
 
-    /* سه دکمه */
+    /* tabs */
     .tabs{
       display:grid;
       grid-template-columns: 1fr 1fr 1fr;
@@ -255,10 +250,9 @@
       box-shadow: 0 0 0 1px rgba(47,140,255,.12), 0 20px 70px rgba(47,140,255,.18);
       color:#06110d;
     }
-
     .tabBtn.active::after{ opacity:1; }
 
-    /* محتوای بخش‌ها */
+    /* content area */
     .panelArea{
       margin-top:14px;
       background: rgba(0,0,0,.18);
@@ -306,7 +300,80 @@
       display:inline-block;
     }
 
-    /* ریسپانسیو */
+    /* فروشگاه پایین صفحه + پنل */
+    .shopGrid{
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-top:12px;
+    }
+    .shopCard{
+      flex: 1 1 220px;
+      border:1px solid rgba(255,255,255,.10);
+      border-radius:14px;
+      background: rgba(255,255,255,.03);
+      padding:14px;
+      min-width:220px;
+      position:relative;
+      overflow:hidden;
+    }
+    .shopCard::after{
+      content:"";
+      position:absolute;
+      inset:-2px;
+      background: radial-gradient(420px 140px at 40% 0%, rgba(47,140,255,.20), transparent 62%);
+      opacity:.6;
+      pointer-events:none;
+    }
+    .shopCard b{ position:relative; z-index:1; font-size:15px; }
+    .shopCard .desc{ position:relative; z-index:1; margin-top:8px; color:var(--muted); font-size:12px; line-height:1.8; }
+
+    .btn{
+      border:0;
+      cursor:pointer;
+      padding:12px 14px;
+      border-radius:14px;
+      font-weight:1000;
+      letter-spacing:.2px;
+      background: rgba(255,255,255,.04);
+      color: rgba(234,242,255,.92);
+      border:1px solid rgba(255,255,255,.10);
+      transition: transform .15s ease, filter .15s ease;
+      position:relative;
+      z-index:1;
+      width:100%;
+      margin-top:12px;
+    }
+    .btn:hover{ transform: translateY(-2px); filter: brightness(1.05); }
+
+    .btn.primary{
+      background: linear-gradient(135deg, rgba(47,140,255,.95), rgba(31,111,255,.55));
+      border-color: rgba(47,140,255,.55);
+      color:#06110d;
+      box-shadow: 0 18px 50px rgba(47,140,255,.18);
+    }
+
+    .panelDetails{
+      margin-top:14px;
+      border:1px solid rgba(0,229,255,.35);
+      border-radius:16px;
+      padding:14px;
+      background: rgba(0,0,0,.18);
+      display:none;
+    }
+    .panelDetails h4{ margin:0 0 10px; font-size:16px; font-weight:1000; }
+    .panelLine{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      color:var(--muted);
+      font-size:13px;
+      padding:6px 0;
+      border-bottom:1px dashed rgba(255,255,255,.10);
+    }
+    .panelLine:last-child{ border-bottom:0; }
+    .panelLine span:last-child{ color: rgba(234,242,255,.95); font-weight:1000; }
+
     @media (max-width: 720px){
       .userBar{ flex-direction:column; align-items:flex-start; }
       .stats{ justify-content:flex-start; gap:10px; flex-wrap:wrap; }
@@ -327,7 +394,7 @@
             <div class="logo">W</div>
           </div>
           <div class="title">WARDENLAND</div>
-          <p class="sub">فروشگاه • تیکت • پنل — UI خفن مثل تصویر</p>
+          <p class="sub"></p>
         </div>
 
         <div class="userBar">
@@ -371,6 +438,33 @@
           <div style="margin-top:14px; color:rgba(234,242,255,.75); font-size:12px; line-height:1.9">
             اگر اکانت ساخته نشده باشد، دکمه «پنل» می‌تونه لینک به صفحه ورودت بده.
           </div>
+
+          <!-- ✅ فروشگاه پایین صفحه -->
+          <div id="shopSection" style="margin-top:14px; display:block;">
+            <div class="shopGrid">
+              <div class="shopCard">
+                <b>VIP / MVP</b>
+                <div class="desc">برای خرید کلیک کنید</div>
+                <button class="btn primary" data-rank="MVP">برای خرید کلیک کنید</button>
+              </div>
+
+              <div class="shopCard">
+                <b>V2</b>
+                <div class="desc">برای خرید کلیک کنید</div>
+                <button class="btn primary" data-rank="V2">برای خرید کلیک کنید</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- ✅ پنل کاربر -->
+          <div class="panelDetails" id="panelDetails">
+            <h4>پنل شما</h4>
+            <div class="panelLine"><span>رنک خریداری شده</span><span id="pRank">-</span></div>
+            <div class="panelLine"><span>مدت حضور در سایت تا الان</span><span id="pTime">-</span></div>
+            <div class="panelLine"><span>اسم</span><span id="pName">-</span></div>
+            <div class="panelLine"><span>تاریخ ثبت نام</span><span id="pDate">-</span></div>
+          </div>
+
         </div>
 
       </div>
@@ -379,8 +473,12 @@
 
   <script>
     // ===== محدودیت: فقط تا ۱ اکانت بسازه (سشن ۱۰ دقیقه‌ای حذف) =====
-    // این site.html خودش اکانت نمی‌سازه؛ فقط می‌خونه که اکانت ساخته شده یا نه.
     const LS_USERS = "zrx:users:v1";
+
+    // ===== اطلاعات پنل/خرید (این‌ها را باید در صفحه ورود/ساخت هم ست کنی) =====
+    const LS_RANK = "zrx:rank:v1"; // MVP / V2
+    const LS_NAME = "zrx:name:v1"; // اسم کاربر
+    const LS_DATE = "zrx:reg:v1";  // ISO string تاریخ ثبت نام
 
     const $ = (id)=>document.getElementById(id);
 
@@ -402,15 +500,15 @@
     const tabs = {
       shop: {
         title: "فروشگاه",
-        text: "اینجا بخش فروشگاهته. می‌تونی آیتم‌ها/قیمت‌ها/پلن‌ها رو کارت‌کارت بچینی."
+        text: "اینجا می‌تونی آیتم‌ها/پلن‌ها رو بچینی."
       },
       ticket: {
         title: "تیکت",
-        text: "اینجا بخش تیکته. می‌تونی فرم ثبت تیکت و لیست تیکت‌ها رو بذاری."
+        text: "اینجا بخش تیکته."
       },
       panel: {
         title: "پنل",
-        text: "اینجا بخش پنله. اگر هنوز اکانت نساختی، باید بری صفحه ورود/ساخت اکانت."
+        text: "مشخصات خرید و زمان حضور شما."
       }
     };
 
@@ -419,24 +517,77 @@
         b.classList.toggle("active", b.dataset.tab === tab);
       });
 
-      // اگر پنل و اکانت ساخته نشده بود، پیام/لینک می‌ذاریم
       const users = loadUsers();
       const total = countUsers(users);
 
+      // پنل: اگر اکانت ساخته نشده بود
       if(tab === "panel" && total < 1){
         $("panelTitle").textContent = tabs.panel.title;
         $("panelText").textContent = "برای ورود به پنل، اول باید اکانت بسازی (فقط ۱ اکانت).";
-        $("panelArea").querySelector(".badge").innerHTML = `<i></i> اکانت لازم است`;
+        $("panelDetails").style.display = "none";
         return;
       }
 
-      // content معمول
       $("panelTitle").textContent = tabs[tab].title;
       $("panelText").textContent = tabs[tab].text;
+
+      // نمایش/عدم نمایش جزئیات پنل
+      if(tab === "panel"){
+        renderPanelDetails();
+      }else{
+        $("panelDetails").style.display = "none";
+      }
+
       $("panelArea").querySelector(".badge").innerHTML = `<i></i> دسترسی اوکی`;
     }
 
-    // نمایش وضعیت کاربر (فقط اگر اکانت ساخته شده باشه)
+    function formatTime(ms){
+      if(ms < 0 || !Number.isFinite(ms)) return "-";
+      const s = Math.floor(ms/1000);
+      const d = Math.floor(s/86400);
+      const h = Math.floor((s%86400)/3600);
+      const m = Math.floor((s%3600)/60);
+      const parts = [];
+      if(d) parts.push(d+" روز");
+      if(h) parts.push(h+" ساعت");
+      if(m || parts.length===0) parts.push(m+" دقیقه");
+      return parts.join(" ");
+    }
+
+    function renderPanelDetails(){
+      const rank = localStorage.getItem(LS_RANK);
+      const name = localStorage.getItem(LS_NAME) || "-";
+      const reg = localStorage.getItem(LS_DATE);
+
+      const panelDetails = $("panelDetails");
+
+      if(!rank || !reg){
+        panelDetails.style.display = "none";
+        $("panelTitle").textContent = "پنل";
+        $("panelText").textContent = "هنوز رنک/اطلاعات ثبت نام شما کامل نشده. از فروشگاه خرید انجام بده.";
+        return;
+      }
+
+      $("pRank").textContent = rank;
+      $("pName").textContent = name;
+
+      const regDate = new Date(reg);
+      $("pDate").textContent = isNaN(regDate.getTime()) ? "-" : regDate.toLocaleString("fa-IR");
+
+      const update = () => {
+        const ms = Date.now() - regDate.getTime();
+        $("pTime").textContent = formatTime(ms);
+      };
+      update();
+      panelDetails.style.display = "block";
+
+      // فقط یک interval فعال نگه داریم
+      if(window.__panelTimer){
+        clearInterval(window.__panelTimer);
+      }
+      window.__panelTimer = setInterval(update, 1000);
+    }
+
     function renderHeader(){
       const users = loadUsers();
       const total = countUsers(users);
@@ -449,7 +600,6 @@
         $("avatarTxt").textContent = "?";
         $("statusTxt").textContent = "نیاز به ساخت";
       }else{
-        // چون سشن حذف شد، فقط یوزر اولین اکانت رو نشون می‌دیم
         const firstUser = Object.keys(users)[0] || "User";
         $("usernameTxt").textContent = firstUser;
         $("noteTxt").textContent = "اکانت ساخته شده (پنل فعال)";
@@ -458,6 +608,23 @@
       }
     }
 
+    // کلیک خرید: ذخیره رنک + (اگر اسم/تاریخ ثبت نام نداریم) فعلاً ست پیش‌فرض
+    document.querySelectorAll('#shopSection button[data-rank]').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const r = btn.getAttribute('data-rank');
+        localStorage.setItem(LS_RANK, r);
+
+        // اگر اسم و تاریخ از قبل ست نشده، اینجا نمی‌تونم اسم واقعی بدون سیستم ورودت داشته باشم
+        if(!localStorage.getItem(LS_NAME)) localStorage.setItem(LS_NAME, $("usernameTxt").textContent || "کاربر");
+        if(!localStorage.getItem(LS_DATE)) localStorage.setItem(LS_DATE, new Date().toISOString());
+
+        // اگر الان روی پنل هستی، نمایش بده
+        if(document.querySelector('.tabBtn.active')?.dataset.tab === "panel"){
+          renderPanelDetails();
+        }
+      });
+    });
+
     document.querySelectorAll(".tabBtn").forEach(btn=>{
       btn.addEventListener("click", ()=>{
         const tab = btn.dataset.tab;
@@ -465,7 +632,6 @@
       });
     });
 
-    // init
     renderHeader();
     setActiveTab("shop");
   </script>
