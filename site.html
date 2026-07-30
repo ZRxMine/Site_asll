@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>WARDENLAND | ZRX_LAND</title>
+
+  <style>
+    :root{
+      --bg:#070b12;
+      --card: rgba(255,255,255,.06);
+      --card2: rgba(0,0,0,.22);
+      --stroke: rgba(255,255,255,.10);
+      --text:#eaf2ff;
+      --muted: rgba(234,242,255,.68);
+
+      --blue:#2f8cff;
+      --blue2:#1f6fff;
+
+      --green:#17ff7b;
+      --red:#ff4d5a;
+      --gray:#1a2433;
+
+      --shadow: 0 22px 90px rgba(0,0,0,.55);
+      --radius: 22px;
+      --radius2: 16px;
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Tahoma, Arial;
+      color:var(--text);
+      min-height:100vh;
+      overflow-x:hidden;
+
+      /* پس‌زمینه شبیه عکس (هکس + نور) */
+      background:
+        radial-gradient(900px 500px at 70% 10%, rgba(47,140,255,.20), transparent 60%),
+        radial-gradient(700px 420px at 20% 30%, rgba(23,255,123,.12), transparent 55%),
+        radial-gradient(900px 520px at 50% 90%, rgba(255,77,90,.10), transparent 60%),
+        linear-gradient(180deg, #070b12, #05070d);
+    }
+
+    /* افکت هکس/کاغذ پس زمینه */
+    .hexfield{
+      position:fixed; inset:0;
+      pointer-events:none;
+      opacity:.35;
+      background:
+        linear-gradient(to bottom, rgba(255,255,255,.02), rgba(255,255,255,.00)),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180' viewBox='0 0 180 180'%3E%3Cg fill='none' stroke='%23a6ffcf' stroke-opacity='.35' stroke-width='2'%3E%3Cpath d='M45 10 L135 10 L180 90 L135 170 L45 170 L0 90 Z'/%3E%3Cpath d='M15 37 L75 7 L145 43 L175 103 L105 163 L35 137 Z'/%3E%3C/g%3E%3C/svg%3E");
+      background-size: 220px 220px;
+      filter: blur(.3px);
+      transform: translateZ(0);
+      animation: drift 10s ease-in-out infinite;
+    }
+    @keyframes drift{
+      0%,100%{ transform: translate3d(0,0,0); }
+      50%{ transform: translate3d(-12px,10px,0); }
+    }
+
+    /* کارت مرکزی */
+    .wrap{
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:28px 14px;
+      position:relative;
+    }
+
+    .card{
+      width:min(980px, 100%);
+      background: linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.03));
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+      backdrop-filter: blur(10px);
+      position:relative;
+    }
+
+    .card::before{
+      content:"";
+      position:absolute; inset:-2px;
+      background: radial-gradient(500px 180px at 50% 0%, rgba(47,140,255,.22), transparent 60%);
+      pointer-events:none;
+    }
+
+    .inner{
+      position:relative;
+      padding:22px;
+    }
+
+    /* هدر کارت */
+    .header{
+      display:flex;
+      gap:14px;
+      align-items:center;
+      justify-content:center;
+      flex-direction:column;
+      padding:8px 0 18px;
+      text-align:center;
+    }
+
+    .logoWrap{
+      width:58px; height:58px;
+      border-radius:18px;
+      background: rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.14);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      box-shadow: 0 0 0 6px rgba(47,140,255,.06);
+    }
+
+    .logo{
+      width:44px;height:44px;border-radius:16px;
+      background:
+        radial-gradient(circle at 30% 30%, rgba(0,0,0,.20), transparent 45%),
+        linear-gradient(135deg, rgba(47,140,255,1), rgba(23,255,123,.95));
+      display:flex;align-items:center;justify-content:center;
+      font-weight:1000;
+      letter-spacing:.5px;
+      color:#06110d;
+      text-shadow: 0 0 18px rgba(23,255,123,.25);
+      user-select:none;
+    }
+
+    .title{
+      font-size:34px;
+      font-weight:1000;
+      letter-spacing:.8px;
+      margin:6px 0 0;
+      color:#7bc0ff;
+      text-shadow: 0 0 28px rgba(47,140,255,.18);
+    }
+
+    .sub{
+      margin:0;
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.8;
+    }
+
+    /* ناحیه آواتار/کاربر مثل عکس */
+    .userBar{
+      margin:12px auto 18px;
+      width:min(720px, 100%);
+      background: rgba(0,0,0,.18);
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 18px;
+      padding:12px 14px;
+      backdrop-filter: blur(10px);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
+    }
+
+    .userLeft{
+      display:flex; align-items:center; gap:10px;
+      min-width: 220px;
+    }
+
+    .avatar{
+      width:42px;height:42px;border-radius:16px;
+      background: linear-gradient(135deg, rgba(47,140,255,.9), rgba(255,77,90,.65));
+      border:1px solid rgba(255,255,255,.14);
+      display:flex;align-items:center;justify-content:center;
+      font-weight:1000;
+      color:#06110d;
+      text-shadow: 0 0 18px rgba(255,255,255,.14);
+    }
+
+    .who{
+      display:flex; flex-direction:column; align-items:flex-start;
+      gap:2px;
+    }
+    .who b{ font-size:14px; }
+    .who span{ font-size:12px; color:var(--muted); }
+
+    .stats{
+      display:flex; gap:16px; align-items:center;
+      width:100%;
+      justify-content:space-around;
+      color:var(--muted);
+      font-size:12px;
+    }
+    .stat{
+      text-align:center;
+      padding:6px 10px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.06);
+      background: rgba(255,255,255,.03);
+      min-width: 140px;
+    }
+    .stat strong{
+      display:block;
+      color: rgba(234,242,255,.92);
+      font-size:12px;
+      margin-bottom:4px;
+      font-weight:1000;
+    }
+
+    /* سه دکمه */
+    .tabs{
+      display:grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap:12px;
+      margin-top: 10px;
+    }
+
+    .tabBtn{
+      position:relative;
+      width:100%;
+      padding:14px 12px;
+      border-radius: 18px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.04);
+      color: rgba(234,242,255,.92);
+      cursor:pointer;
+      transition: transform .15s ease, filter .15s ease, background .15s ease;
+      font-weight:1000;
+      letter-spacing:.2px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      user-select:none;
+      overflow:hidden;
+    }
+
+    .tabBtn::after{
+      content:"";
+      position:absolute;
+      inset:-2px;
+      background: radial-gradient(380px 120px at 40% 0%, rgba(47,140,255,.22), transparent 62%);
+      opacity:0;
+      transition: opacity .2s ease;
+      pointer-events:none;
+    }
+
+    .tabBtn:hover{
+      transform: translateY(-2px);
+      filter: brightness(1.05);
+      background: rgba(255,255,255,.06);
+    }
+    .tabBtn:hover::after{ opacity:1; }
+
+    .tabBtn.active{
+      background: linear-gradient(135deg, rgba(47,140,255,.95), rgba(31,111,255,.55));
+      border-color: rgba(47,140,255,.55);
+      box-shadow: 0 0 0 1px rgba(47,140,255,.12), 0 20px 70px rgba(47,140,255,.18);
+      color:#06110d;
+    }
+
+    .tabBtn.active::after{ opacity:1; }
+
+    /* محتوای بخش‌ها */
+    .panelArea{
+      margin-top:14px;
+      background: rgba(0,0,0,.18);
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 18px;
+      padding:16px;
+      min-height: 220px;
+      animation: panelIn .25s ease both;
+    }
+    @keyframes panelIn{
+      from{ opacity:0; transform: translateY(8px) scale(.99); filter: blur(2px); }
+      to{ opacity:1; transform: translateY(0) scale(1); filter: blur(0); }
+    }
+
+    .panelTitle{
+      font-weight:1000;
+      font-size:18px;
+      letter-spacing:.3px;
+      margin:0 0 8px;
+    }
+    .panelText{
+      margin:0 0 12px;
+      color: var(--muted);
+      line-height:1.9;
+      font-size:13px;
+    }
+
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:10px 12px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.04);
+      color: rgba(234,242,255,.92);
+      font-weight:1000;
+      font-size:12px;
+      margin-top:10px;
+    }
+    .badge i{
+      width:10px;height:10px;border-radius:50%;
+      background: var(--blue);
+      box-shadow: 0 0 20px rgba(47,140,255,.35);
+      display:inline-block;
+    }
+
+    /* ریسپانسیو */
+    @media (max-width: 720px){
+      .userBar{ flex-direction:column; align-items:flex-start; }
+      .stats{ justify-content:flex-start; gap:10px; flex-wrap:wrap; }
+      .stat{ min-width: 150px; }
+      .tabs{ grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="hexfield"></div>
+
+  <div class="wrap">
+    <div class="card">
+      <div class="inner">
+        <div class="header">
+          <div class="logoWrap">
+            <div class="logo">W</div>
+          </div>
+          <div class="title">WARDENLAND</div>
+          <p class="sub">فروشگاه • تیکت • پنل — UI خفن مثل تصویر</p>
+        </div>
+
+        <div class="userBar">
+          <div class="userLeft">
+            <div class="avatar" id="avatarTxt">? </div>
+            <div class="who">
+              <b id="usernameTxt">وارد نشده</b>
+              <span id="noteTxt">اکانت بساز تا فعال بشه</span>
+            </div>
+          </div>
+
+          <div class="stats">
+            <div class="stat">
+              <strong>اکانت‌ها</strong>
+              <div id="countUsersTxt">0</div>
+            </div>
+            <div class="stat">
+              <strong>محدودیت</strong>
+              <div>فقط ۱ اکانت</div>
+            </div>
+            <div class="stat">
+              <strong>وضعیت</strong>
+              <div id="statusTxt">نیاز به ساخت</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tabs">
+          <button class="tabBtn active" data-tab="shop" id="btnShop">🛒 فروشگاه</button>
+          <button class="tabBtn" data-tab="ticket" id="btnTicket">🎫 تیکت</button>
+          <button class="tabBtn" data-tab="panel" id="btnPanel">🧩 پنل</button>
+        </div>
+
+        <div class="panelArea" id="panelArea">
+          <h3 class="panelTitle" id="panelTitle">فروشگاه</h3>
+          <p class="panelText" id="panelText">
+            اینجا می‌تونی بخش فروشگاه رو بذاری. الان فقط UI هست.
+          </p>
+          <div class="badge"><i></i> روی دکمه‌ها کلیک کن</div>
+
+          <div style="margin-top:14px; color:rgba(234,242,255,.75); font-size:12px; line-height:1.9">
+            اگر اکانت ساخته نشده باشد، دکمه «پنل» می‌تونه لینک به صفحه ورودت بده.
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ===== محدودیت: فقط تا ۱ اکانت بسازه (سشن ۱۰ دقیقه‌ای حذف) =====
+    // این site.html خودش اکانت نمی‌سازه؛ فقط می‌خونه که اکانت ساخته شده یا نه.
+    const LS_USERS = "zrx:users:v1";
+
+    const $ = (id)=>document.getElementById(id);
+
+    function loadUsers(){
+      const raw = localStorage.getItem(LS_USERS);
+      if(!raw) return {};
+      try{
+        const obj = JSON.parse(raw);
+        return (obj && typeof obj === "object") ? obj : {};
+      }catch{
+        return {};
+      }
+    }
+
+    function countUsers(users){
+      return Object.keys(users || {}).length;
+    }
+
+    const tabs = {
+      shop: {
+        title: "فروشگاه",
+        text: "اینجا بخش فروشگاهته. می‌تونی آیتم‌ها/قیمت‌ها/پلن‌ها رو کارت‌کارت بچینی."
+      },
+      ticket: {
+        title: "تیکت",
+        text: "اینجا بخش تیکته. می‌تونی فرم ثبت تیکت و لیست تیکت‌ها رو بذاری."
+      },
+      panel: {
+        title: "پنل",
+        text: "اینجا بخش پنله. اگر هنوز اکانت نساختی، باید بری صفحه ورود/ساخت اکانت."
+      }
+    };
+
+    function setActiveTab(tab){
+      document.querySelectorAll(".tabBtn").forEach(b=>{
+        b.classList.toggle("active", b.dataset.tab === tab);
+      });
+
+      // اگر پنل و اکانت ساخته نشده بود، پیام/لینک می‌ذاریم
+      const users = loadUsers();
+      const total = countUsers(users);
+
+      if(tab === "panel" && total < 1){
+        $("panelTitle").textContent = tabs.panel.title;
+        $("panelText").textContent = "برای ورود به پنل، اول باید اکانت بسازی (فقط ۱ اکانت).";
+        $("panelArea").querySelector(".badge").innerHTML = `<i></i> اکانت لازم است`;
+        return;
+      }
+
+      // content معمول
+      $("panelTitle").textContent = tabs[tab].title;
+      $("panelText").textContent = tabs[tab].text;
+      $("panelArea").querySelector(".badge").innerHTML = `<i></i> دسترسی اوکی`;
+    }
+
+    // نمایش وضعیت کاربر (فقط اگر اکانت ساخته شده باشه)
+    function renderHeader(){
+      const users = loadUsers();
+      const total = countUsers(users);
+
+      $("countUsersTxt").textContent = total;
+
+      if(total < 1){
+        $("usernameTxt").textContent = "وارد نشده";
+        $("noteTxt").textContent = "اکانت بساز تا فعال بشه";
+        $("avatarTxt").textContent = "?";
+        $("statusTxt").textContent = "نیاز به ساخت";
+      }else{
+        // چون سشن حذف شد، فقط یوزر اولین اکانت رو نشون می‌دیم
+        const firstUser = Object.keys(users)[0] || "User";
+        $("usernameTxt").textContent = firstUser;
+        $("noteTxt").textContent = "اکانت ساخته شده (پنل فعال)";
+        $("avatarTxt").textContent = (firstUser[0] || "U").toUpperCase();
+        $("statusTxt").textContent = "اکانت آماده";
+      }
+    }
+
+    document.querySelectorAll(".tabBtn").forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        const tab = btn.dataset.tab;
+        setActiveTab(tab);
+      });
+    });
+
+    // init
+    renderHeader();
+    setActiveTab("shop");
+  </script>
+</body>
+</html>
