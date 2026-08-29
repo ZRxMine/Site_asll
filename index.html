@@ -1,283 +1,64 @@
-<!doctype html>
-<html lang="fa" dir="rtl">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>ZRX_LAND</title>
-  <link rel="stylesheet" href="style.css" />
-</head>
+<!DOCTYPE html>
+<html>
+<head><style>body { margin: 0; background: #111; overflow: hidden; } #crosshair { position: absolute; top: 50%; left: 50%; width: 10px; height: 10px; background: red; border-radius: 50%; transform: translate(-50%, -50%); }</style></head>
 <body>
-  <div class="bg">
-    <div class="wave w1"></div>
-    <div class="wave w2"></div>
-    <div class="wave w3"></div>
-    <div class="grain"></div>
-    <div class="vignette"></div>
-  </div>
+    <div id="crosshair"></div>
+    <script type="module">
+        import * as THREE from 'https://unpkg.com/three@0.158.0/build/three.module.js';
+        import { PointerLockControls } from 'https://unpkg.com/three@0.158.0/examples/jsm/controls/PointerLockControls.js';
 
-  <main class="wrap">
-    <header class="hero">
-      <div class="brandMark" aria-hidden="true">ZRX</div>
-      <div class="heroText">
-        <div class="kicker">ZRX_LAND</div>
-        <h1 class="title">
-          پنل ورود
-          <span class="subTitle"></span>
-        </h1>
-      </div>
-    </header>
+        // 1. Core Scene
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x222222);
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
 
-    <section class="card" id="panel">
-      <!-- PAGE: LOGIN -->
-      <div class="pane" id="paneLogin">
-        <div class="cardHead">
-          <div class="lockTag">🔒</div>
-          <div class="headText">
-            <h2>ورود</h2>
-            <p> اگر هنوز اکانت ساخته نشده باشه، با دکمه ورود اکانت ساخته ‌میشه.</p>
-          </div>
-        </div>
+        // 2. Weapon (The Viewmodel)
+        const gun = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.1, 0.5), new THREE.MeshBasicMaterial({ color: 0x555555 }));
+        gun.position.set(0.2, -0.2, -0.4); // Positioned bottom right
+        camera.add(gun); // Attach gun to camera so it moves with view
+        scene.add(camera);
 
-        <div class="fields">
-          <div class="field">
-            <label>نام کاربری</label>
-            <input id="username" autocomplete="username" placeholder="مثلاً ZRX" />
-          </div>
-          <div class="field">
-            <label>پسورد</label>
-            <input id="password" type="password" autocomplete="current-password" placeholder="پسورد اکانت" />
-          </div>
-        </div>
+        // 3. Map (Simple Obstacles)
+        const floor = new THREE.Mesh(new THREE.PlaneGeometry(100, 100), new THREE.MeshBasicMaterial({ color: 0x444444 }));
+        floor.rotation.x = -Math.PI / 2;
+        scene.add(floor);
 
-        <button class="btn primary" id="btnLogin" onclick="location.href='site.html'">ورود / ساخت اکانت</button>
-
-        <div class="actions">
-          <button class="btn ghost" id="btnClearAll">پاک کردن همه (اکانت ها)</button>
-          <button class="btn ghost" id="btnLogout"></button>
-        </div>
-
-        <div class="status" id="status"></div>
-
-        <div class="note">
-          <span class="dot"></span>
-          <span></span>
-        </div>
-      </div>
-
-      <!-- PAGE: LOGGED IN -->
-      <div class="pane hidden" id="paneApp">
-        <div class="cardHead">
-          <div class="okTag">✅</div>
-          <div class="headText">
-            <h2>وارد شدی</h2>
-            <p id="welcomeText">خوش اومدی</p>
-          </div>
-        </div>
-
-        <div class="meter">
-          <div class="meterTop">
-            <div class="meterLabel">وضعیت دسترسی</div>
-            <div class="meterValue">ACTIVE</div>
-          </div>
-          <div class="bar">
-            <div class="barFill"></div>
-          </div>
-          <div class="meterHint">تا وقتی خودت خروج یا پاک‌سازی نکنی وارد می‌مونی.</div>
-        </div>
-
-        <div class="appBox">
-          <div class="bigText">ZRX_LAND ✅</div>
-          <div class="smallText">
-            اینجا محتوای سایتت قرار می‌گیره.
-          </div>
-        </div>
-
-        <div class="actions">
-          <button class="btn primary" id="btnLogout2">خروج</button>
-          <button class="btn ghost" id="btnDeleteAccount">حذف اکانت</button>
-        </div>
-
-        <div class="status" id="status2"></div>
-      </div>
-    </section>
-  </main>
-
-  <script>
-    // ===== LocalStorage keys =====
-    const LS_USERS = "zrx:users:v1";      // فقط 1 اکانت
-    const LS_LOGIN = "zrx:login:v1";      // وضعیت وارد بودن
-
-    const $ = (id) => document.getElementById(id);
-
-    const paneLogin = $("paneLogin");
-    const paneApp = $("paneApp");
-
-    const status1 = $("status");
-    const status2 = $("status2");
-
-    function setStatus(msg){
-      status1.textContent = msg || "";
-    }
-    function setStatus2(msg){
-      status2.textContent = msg || "";
-    }
-
-    function showLogin(){
-      paneApp.classList.add("hidden");
-      paneLogin.classList.remove("hidden");
-      setStatus2("");
-    }
-    function showApp(){
-      paneLogin.classList.add("hidden");
-      paneApp.classList.remove("hidden");
-      setStatus("");
-    }
-
-    function loadUsers(){
-      const raw = localStorage.getItem(LS_USERS);
-      if(!raw) return {};
-      try{
-        const obj = JSON.parse(raw);
-        return (obj && typeof obj === "object") ? obj : {};
-      }catch{ return {}; }
-    }
-    function saveUsers(users){
-      localStorage.setItem(LS_USERS, JSON.stringify(users));
-    }
-
-    function loadLogin(){
-      const raw = localStorage.getItem(LS_LOGIN);
-      if(!raw) return null;
-      try{ return JSON.parse(raw); }catch{ return null; }
-    }
-    function saveLogin(data){
-      localStorage.setItem(LS_LOGIN, JSON.stringify(data));
-    }
-    function clearLogin(){
-      localStorage.removeItem(LS_LOGIN);
-    }
-
-    async function sha256(text){
-      const enc = new TextEncoder().encode(text);
-      const hashBuf = await crypto.subtle.digest("SHA-256", enc);
-      return [...new Uint8Array(hashBuf)].map(b => b.toString(16).padStart(2,"0")).join("");
-    }
-
-    function getAccountCount(){
-      const users = loadUsers();
-      return Object.keys(users).length;
-    }
-
-    async function loginOrCreate(){
-      const username = $("username").value.trim();
-      const password = $("password").value;
-
-      if(!username){
-        setStatus("نام کاربری رو وارد کن.");
-        return;
-      }
-      if(!password || password.length < 1){
-        setStatus("پسورد رو وارد کن.");
-        return;
-      }
-
-      const users = loadUsers();
-      const hasUser = !!users[username];
-
-      // اگر هیچ اکانتی وجود نداره -> بسازه
-      if(Object.keys(users).length === 0){
-        const passHash = await sha256(password);
-        users[username] = { passHash, createdAt: new Date().toISOString() };
-        saveUsers(users);
-        saveLogin({ username });
-        $("welcomeText").textContent = `خوش اومدی ${username}`;
-        showApp();
-        setStatus("");
-        return;
-      }
-
-      // اگر اکانتی هست:
-      // فقط اجازه 1 اکانت داریم؛ پس اگر این یوزر همون اکانته، لاگین کن
-      const onlyOne = getAccountCount() === 1;
-      if(!onlyOne){
-        // حالت غیرمجاز (اگر قبلاً از قبل دستکاری شده باشه)
-        setStatus("خطا: بیشتر از ۱ اکانت وجود دارد. پاک‌سازی تست کن.");
-        return;
-      }
-
-      if(!hasUser){
-        setStatus("فقط یک اکانت اجازه داده می‌شود. همین اکانت را وارد کن.");
-        return;
-      }
-
-      const passHash = await sha256(password);
-      if(passHash !== users[username].passHash){
-        setStatus("پسورد اشتباه است.");
-        return;
-      }
-
-      saveLogin({ username });
-      $("welcomeText").textContent = `خوش اومدی ${username}`;
-      showApp();
-      setStatus("");
-    }
-
-    function logout(){
-      clearLogin();
-      showLogin();
-    }
-
-    async function deleteAccount(){
-      const login = loadLogin();
-      if(!login || !login.username){
-        setStatus2("اول وارد شو.");
-        return;
-      }
-
-      const users = loadUsers();
-      // فقط پاک کردن همون اکانت
-      if(users[login.username]){
-        delete users[login.username];
-        saveUsers(users);
-      }
-      clearLogin();
-      showLogin();
-      $("username").value = "";
-      $("password").value = "";
-      setStatus2("اکانت حذف شد ✅");
-    }
-
-    function clearAll(){
-      if(!confirm("همه چیز پاک شود؟ (تست)")) return;
-      localStorage.removeItem(LS_USERS);
-      localStorage.removeItem(LS_LOGIN);
-      $("username").value = "";
-      $("password").value = "";
-      showLogin();
-      setStatus("همه پاک شد.");
-      setStatus2("");
-    }
-
-    // ===== Events =====
-    $("btnLogin").addEventListener("click", loginOrCreate);
-    $("btnLogout").addEventListener("click", logout);
-    $("btnLogout2").addEventListener("click", logout);
-    $("btnClearAll").addEventListener("click", clearAll);
-    $("btnDeleteAccount").addEventListener("click", deleteAccount);
-
-    // ===== Init =====
-    (function init(){
-      const login = loadLogin();
-      if(login && login.username){
-        const users = loadUsers();
-        if(users[login.username]){
-          $("welcomeText").textContent = `خوش اومدی ${login.username}`;
-          showApp();
-          return;
+        // Create some enemies (Targets)
+        const enemies = [];
+        for(let i = 0; i < 5; i++) {
+            const enemy = new THREE.Mesh(new THREE.BoxGeometry(1, 2, 1), new THREE.MeshBasicMaterial({ color: 0xff0000 }));
+            enemy.position.set(Math.random()*20-10, 1, Math.random()*20-10);
+            scene.add(enemy);
+            enemies.push(enemy);
         }
-      }
-      showLogin();
-    })();
-  </script>
+
+        // 4. Controls & Shooting
+        const controls = new PointerLockControls(camera, document.body);
+        const raycaster = new THREE.Raycaster();
+        
+        document.addEventListener('click', () => {
+            if(!controls.isLocked) { controls.lock(); return; }
+            
+            // SHOOT LOGIC
+            raycaster.setFromCamera(new THREE.Vector2(0, 0), camera); // Center of screen
+            const intersects = raycaster.intersectObjects(enemies);
+            
+            if(intersects.length > 0) {
+                scene.remove(intersects[0].object); // Remove enemy on hit
+                console.log("Enemy Down!");
+            }
+        });
+
+        camera.position.set(0, 1.6, 5);
+        
+        function animate() {
+            requestAnimationFrame(animate);
+            renderer.render(scene, camera);
+        }
+        animate();
+    </script>
 </body>
 </html>
