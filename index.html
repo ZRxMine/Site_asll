@@ -1,64 +1,154 @@
 <!DOCTYPE html>
-<html>
-<head><style>body { margin: 0; background: #111; overflow: hidden; } #crosshair { position: absolute; top: 50%; left: 50%; width: 10px; height: 10px; background: red; border-radius: 50%; transform: translate(-50%, -50%); }</style></head>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Advanced FPS Prototype</title>
+    <style>
+        body { margin: 0; overflow: hidden; background: #000; }
+        /* Crosshair جذاب‌تر */
+        #crosshair {
+            position: absolute; top: 50%; left: 50%;
+            width: 20px; height: 20px;
+            border: 2px solid rgba(0, 255, 0, 0.5);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+        }
+        #crosshair::after {
+            content: ''; position: absolute; top: 50%; left: 50%;
+            width: 2px; height: 2px; background: lime;
+            transform: translate(-50%, -50%);
+        }
+    </style>
+</head>
 <body>
     <div id="crosshair"></div>
+
     <script type="module">
         import * as THREE from 'https://unpkg.com/three@0.158.0/build/three.module.js';
         import { PointerLockControls } from 'https://unpkg.com/three@0.158.0/examples/jsm/controls/PointerLockControls.js';
 
-        // 1. Core Scene
+        // --- Scene Setup ---
         const scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x222222);
+        scene.fog = new THREE.FogExp2(0x111111, 0.02); // اضافه کردن مه برای عمق دادن به مپ
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
         const renderer = new THREE.WebGLRenderer({ antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.shadowMap.enabled = true; // فعال کردن سایه‌ها برای واقع‌گرایی
         document.body.appendChild(renderer.domElement);
 
-        // 2. Weapon (The Viewmodel)
-        const gun = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.1, 0.5), new THREE.MeshBasicMaterial({ color: 0x555555 }));
-        gun.position.set(0.2, -0.2, -0.4); // Positioned bottom right
-        camera.add(gun); // Attach gun to camera so it moves with view
+        // --- Lighting ---
+        const ambientLight = new THREE.AmbientLight(0x404040, 2); 
+        scene.add(ambientLight);
+        const sunLight = new THREE.DirectionalLight(0xffffff, 1);
+        sunLight.position.set(5, 10, 7.5);
+        sunLight.castShadow = true;
+        scene.add(sunLight);
+
+        // --- Gun Setup (Viewmodel) ---
+        const gunGroup = new THREE.Group();
+        const gunBody = new THREE.Mesh(
+            new THREE.BoxGeometry(0.15, 0.2, 0.6),
+            new THREE.MeshStandardMaterial({ color: 0x222222, roughness: 0.2 })
+        );
+        gunGroup.add(gunBody);
+        
+        // Muzzle Flash (نور شلیک)
+        const muzzleFlash = new THREE.PointLight(0xffaa00, 0, 2);
+        muzzleFlash.position.set(0, 0, -0.4);
+        gunGroup.add(muzzleFlash);
+
+        gunGroup.position.set(0.3, -0.3, -0.5);
+        camera.add(gunGroup);
         scene.add(camera);
 
-        // 3. Map (Simple Obstacles)
-        const floor = new THREE.Mesh(new THREE.PlaneGeometry(100, 100), new THREE.MeshBasicMaterial({ color: 0x444444 }));
+        // --- Map (More interesting than a floor) ---
+        const floor = new THREE.Mesh(
+            new THREE.PlaneGeometry(100, 100),
+            new THREE.MeshStandardMaterial({ color: 0x333333 })
+        );
         floor.rotation.x = -Math.PI / 2;
+        floor.receiveShadow = true;
         scene.add(floor);
 
-        // Create some enemies (Targets)
+        // Obstacles (جعبه‌های محیطی)
+        for(let i=0; i<20; i++) {
+            const box = new THREE.Mesh(
+                new THREE.BoxGeometry(2, Math.random()*3+1, 2),
+                new THREE.MeshStandardMaterial({ color: 0x555555 })
+            );
+            box.position.set(Math.random()*40-20, 0, Math.random()*40-20);
+            box.position.y += box.geometry.parameters.height / 2;
+            box.castShadow = true;
+            box.receiveShadow = true;
+            scene.add(box);
+        }
+
+        // Enemies
         const enemies = [];
-        for(let i = 0; i < 5; i++) {
-            const enemy = new THREE.Mesh(new THREE.BoxGeometry(1, 2, 1), new THREE.MeshBasicMaterial({ color: 0xff0000 }));
-            enemy.position.set(Math.random()*20-10, 1, Math.random()*20-10);
+        const enemyGeo = new THREE.CapsuleGeometry(0.5, 1, 4, 8);
+        for(let i=0; i<8; i++) {
+            const enemy = new THREE.Mesh(enemyGeo, new THREE.MeshStandardMaterial({ color: 0xff0000 }));
+            enemy.position.set(Math.random()*30-15, 1, Math.random()*30-15);
+            enemy.castShadow = true;
             scene.add(enemy);
             enemies.push(enemy);
         }
 
-        // 4. Controls & Shooting
+        // --- Logic & Controls ---
         const controls = new PointerLockControls(camera, document.body);
-        const raycaster = new THREE.Raycaster();
-        
         document.addEventListener('click', () => {
             if(!controls.isLocked) { controls.lock(); return; }
-            
-            // SHOOT LOGIC
-            raycaster.setFromCamera(new THREE.Vector2(0, 0), camera); // Center of screen
-            const intersects = raycaster.intersectObjects(enemies);
-            
-            if(intersects.length > 0) {
-                scene.remove(intersects[0].object); // Remove enemy on hit
-                console.log("Enemy Down!");
-            }
+            shoot();
         });
 
-        camera.position.set(0, 1.6, 5);
-        
+        const raycaster = new THREE.Raycaster();
+        let recoilAmount = 0;
+
+        function shoot() {
+            // 1. Visual Recoil (پس‌زدن اسلحه)
+            recoilAmount = 0.1; 
+            
+            // 2. Muzzle Flash (جرقه شلیک)
+            muzzleFlash.intensity = 5;
+            setTimeout(() => muzzleFlash.intensity = 0, 50);
+
+            // 3. Hit Detection
+            raycaster.setFromCamera(new THREE.Vector2(0, 0), camera);
+            const intersects = raycaster.intersectObjects(enemies);
+
+            if(intersects.length > 0) {
+                const target = intersects[0].object;
+                target.material.color.set(0xffffff); // تغییر رنگ موقع اصابت
+                setTimeout(() => scene.remove(target), 100); // غیب شدن
+            }
+        }
+
+        // --- Animation Loop ---
         function animate() {
             requestAnimationFrame(animate);
+
+            // Smooth Recoil Animation
+            if (recoilAmount > 0) {
+                gunGroup.position.z += recoilAmount; // اسلحه به عقب میره
+                recoilAmount *= 0.8; // اثر پس‌زدن کم میشه
+            } else {
+                // بازگشت نرم اسلحه به حالت اول
+                gunGroup.position.z += ( -0.5 - gunGroup.position.z ) * 0.1;
+            }
+
             renderer.render(scene, camera);
         }
+
+        camera.position.y = 1.6;
         animate();
+
+        // Resize handler
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
     </script>
 </body>
 </html>
